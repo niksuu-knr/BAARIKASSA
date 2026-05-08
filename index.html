@@ -2,326 +2,467 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Web-QT6000 POS Hifistelty</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web-QT6000 POS - Complete System</title>
     <style>
         :root {
-            /* Perusvärit */
             --casio-bg: #1a1a1a;
-            --casio-border: #333;
             --screen-bg: #e0e0e0;
-            --status-bar-bg: #33367c;
-            --text-color-white: white;
-            --text-color-black: black;
-
-            /* Painikkeiden "muoviset" värisävyt */
             --btn-base-gray: #4a4d4e;
-            --btn-base-light-gray: #7a7d7e;
             --btn-base-blue: #3a5a8c;
             --btn-base-green: #3b8c4a;
-            --btn-base-orange: #bf7339;
-            --btn-base-pink: #b35976;
+            --btn-base-red: #8c3b3b;
             --btn-base-nav: #7a8c99;
-            --btn-base-yellow: #a69e3a;
-
-            /* "Bezel"-efekti (3D-reuna) */
-            --bezel-width: 3px;
-            --bezel-color-light: rgba(255,255,255,0.4);
-            --bezel-color-dark: rgba(0,0,0,0.5);
+            --bezel-light: rgba(255,255,255,0.3);
+            --bezel-dark: rgba(0,0,0,0.5);
         }
 
         body {
             margin: 0;
             background-color: #000;
-            /* Käytetään tiiviimpää fonttia, joka matkii alkuperäistä näyttöä */
             font-family: 'Arial Narrow', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: var(--text-color-white);
+            color: white;
             user-select: none;
-            overflow: hidden; /* Estää vierityksen */
+            overflow: hidden;
         }
 
-        /* Pääkontti matkii monitoria */
         #pos-container {
             width: 1024px;
             height: 768px;
             background-color: var(--casio-bg);
-            border: 15px solid var(--casio-border);
-            border-radius: 5px;
+            border: 12px solid #333;
             display: grid;
-            grid-template-rows: 35px 1fr; /* Yläpalkki + sisältö */
+            grid-template-rows: 35px 1fr;
             padding: 8px;
             gap: 10px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            position: relative;
         }
 
-        /* Yläpalkki (Reg Manager, Aika, jne.) */
+        /* YLÄPALKKI */
         #status-bar {
-            background-color: var(--status-bar-bg);
+            background-color: #33367c;
             display: flex;
             justify-content: space-between;
             padding: 0 15px;
             align-items: center;
             font-size: 16px;
             border: 2px solid #555;
-            letter-spacing: 1px;
+            transition: background 0.3s;
         }
 
-        /* Pääsisältöalue */
+        /* PÄÄNÄKYMÄ */
         #main-layout {
             display: grid;
-            grid-template-columns: 460px 1fr; /* Vasen näyttö/numpad | Oikea tuoteristikko */
+            grid-template-columns: 460px 1fr;
             gap: 10px;
         }
 
-        /* Vasen sarake */
+        /* VASEN SARAKE: NÄYTTÖ JA NUMERONÄPPÄIMISTÖ */
         #left-col {
-            display: grid;
-            grid-template-rows: 270px 1fr;
-            gap: 10px;
-        }
-
-        /* Myyntinäyttö (Valkoinen alue) */
-        #display-area {
-            background-color: var(--screen-bg);
-            border: 4px solid #666;
-            color: var(--text-color-black);
             display: flex;
             flex-direction: column;
-            position: relative;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            gap: 5px;
         }
 
-        .display-header {
-            background: #cbd5e0;
-            padding: 8px;
-            font-weight: bold;
-            border-bottom: 2px solid #999;
-            text-align: center;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
+        #display-area {
+            background-color: var(--screen-bg);
+            height: 320px;
+            border: 4px solid #666;
+            color: black;
+            position: relative;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         #receipt-content {
-            flex-grow: 1;
             padding: 10px;
-            font-family: monospace; /* Tärkeä kuitille */
-            font-size: 20px;
-            line-height: 1.3;
+            font-family: monospace;
+            flex-grow: 1;
         }
 
-        /* Kelta-vihreä status-palkki kuitin alla */
-        .status-tag {
-            background: linear-gradient(180deg, #e2e84e 0%, #a69e3a 100%);
-            color: black;
-            padding: 5px 15px;
+        #input-buffer {
+            background: #000;
+            color: #0f0;
+            height: 45px;
+            border: 2px solid #555;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 32px;
             font-weight: bold;
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            box-sizing: border-box;
-            border-top: 1px solid #999;
         }
 
-        /* --- PAINIKKEIDEN HIOMINEN (Casio-look) --- */
+        /* PAPERIKUITTI TYYLI */
+        .paper-receipt {
+            background: #fff;
+            color: #000;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        /* NÄPPÄIMET */
         .grid-btn {
-            border-radius: 4px; /* Hieman pyöristetyt kulmat muoville */
-            color: var(--text-color-white);
+            border-radius: 4px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
             text-transform: uppercase;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 5px;
-            transition: transform 0.05s, box-shadow 0.05s;
-
-            /* TÄRKEÄ 3D-EFEKTI (Bezel) */
-            border: var(--bezel-width) solid transparent;
-            border-top-color: var(--bezel-color-light);
-            border-left-color: var(--bezel-color-light);
-            border-bottom-color: var(--bezel-color-dark);
-            border-right-color: var(--bezel-color-dark);
-            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), 0 2px 3px rgba(0,0,0,0.4);
+            border: 3px solid transparent;
+            border-top-color: var(--bezel-light);
+            border-left-color: var(--bezel-light);
+            border-bottom-color: var(--bezel-dark);
+            border-right-color: var(--bezel-dark);
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.1), 0 2px 3px rgba(0,0,0,0.4);
+            color: white;
         }
 
         .grid-btn:active {
-            /* Painallusefektissä Bezel kääntyy */
-            border-top-color: var(--bezel-color-dark);
-            border-left-color: var(--bezel-color-dark);
-            border-bottom-color: var(--bezel-color-light);
-            border-right-color: var(--bezel-color-light);
-            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+            border-top-color: var(--bezel-dark);
+            border-left-color: var(--bezel-dark);
+            border-bottom-color: var(--bezel-light);
+            border-right-color: var(--bezel-light);
             transform: translateY(1px);
         }
 
-        /* Alaosan näppäimistö (Vasen ala) */
-        #numpad-area {
+        #numpad {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(6, 1fr);
-            gap: 6px; /* Hieman suurempi rako muovipainikkeiden välillä */
+            gap: 5px;
+            flex-grow: 1;
         }
 
-        /* Oikean puolen tuoteristikko */
         #product-grid {
             display: grid;
-            grid-template-columns: 55px repeat(5, 1fr); /* Nuolet + 5 saraketta */
+            grid-template-columns: 55px repeat(5, 1fr);
             grid-template-rows: repeat(10, 1fr);
             gap: 6px;
         }
 
-        /* Värikoodit päivitetty vastaamaan image_6.png hiontaa */
-        .c-gray { background-color: var(--btn-base-gray); }
-        .c-num { background-color: var(--btn-base-gray); color: white; } /* Numerot harmaalla */
-        .c-green { background-color: var(--btn-base-green); }
-        .c-orange { background-color: var(--btn-base-orange); }
-        .c-blue { background-color: var(--btn-base-blue); }
-        .c-pink { background-color: var(--btn-base-pink); }
-        .c-nav { background-color: var(--btn-base-nav); } /* Nuolet pystyssä */
-        .c-black { background-color: #080808; border-color: #000; } /* Syvä musta */
-        .c-yellow { background-color: var(--btn-base-yellow); color: black; }
+        /* PGM OVERLAY */
+        #pgm-overlay {
+            display: none;
+            position: absolute;
+            top: 45px; left: 8px; right: 8px; bottom: 8px;
+            background: #2c3e50;
+            z-index: 100;
+            padding: 20px;
+            border: 2px solid #7f8c8d;
+        }
 
-        /* Erikoisasettelut */
-        .double-width { grid-column: span 2; }
-        .text-black { color: black; } /* Joissain painikkeissa musta teksti */
+        /* MAKSUPÄÄTE */
+        #terminal-overlay {
+            display: none;
+            position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 350px; background: #eee; color: #333;
+            border: 5px solid #555; border-radius: 10px;
+            z-index: 1000; text-align: center; padding: 25px;
+        }
 
+        .c-gray { background: var(--btn-base-gray); }
+        .c-blue { background: var(--btn-base-blue); }
+        .c-green { background: var(--btn-base-green); }
+        .c-red { background: var(--btn-base-red); }
+        .c-black { background: #000; }
+        .c-nav { background: var(--btn-base-nav); }
+
+        input, select { width: 100%; padding: 8px; margin: 5px 0 15px 0; }
+        .selected-for-edit { outline: 4px solid #f1c40f; transform: scale(1.05); z-index: 10; }
     </style>
 </head>
 <body>
 
+<div id="terminal-overlay">
+    <h2 id="term-status">YHDISTETÄÄN...</h2>
+    <p>Käytä korttia tai lähimaksua</p>
+    <h1 id="term-sum">0.00 €</h1>
+</div>
+
 <div id="pos-container">
     <div id="status-bar">
-        <span>REG MANAGER</span>
-        <span>16-02-18 09:21</span>
-        <span>000023</span>
+        <span id="mode-text">REG MANAGER</span>
+        <span id="clock">09:21:45</span>
+        <span>ID: 000023</span>
+    </div>
+
+    <!-- PGM-MODAALI -->
+    <div id="pgm-overlay">
+        <h2>PGM - OHJELMOINTI</h2>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="background:rgba(0,0,0,0.2); padding: 15px;">
+                <h3>TUOTTEEN MUOKKAUS</h3>
+                <label>Näppäin teksti:</label><input type="text" id="p-text">
+                <label>Hinta (€):</label><input type="number" step="0.01" id="p-price">
+                <label>Väri:</label>
+                <select id="p-color">
+                    <option value="#3b8c4a">Vihreä (Juomat)</option>
+                    <option value="#bf7339">Oranssi (Ruoka)</option>
+                    <option value="#3a5a8c">Sininen</option>
+                    <option value="#b35976">Punainen</option>
+                </select>
+                <button onclick="saveProduct()" style="width:100%; padding:15px; background:green; color:white; border:none; cursor:pointer;">TALLENNA</button>
+            </div>
+            <div>
+                <button onclick="toggleMode('REG')" style="width:100%; padding:15px; background:red; color:white; border:none; cursor:pointer;">SULJE PGM</button>
+            </div>
+        </div>
     </div>
 
     <div id="main-layout">
-        <!-- VASEN PUOLI -->
         <div id="left-col">
             <div id="display-area">
-                <div class="display-header">MYYNTI</div>
-                <div id="receipt-content">
-                    <div style="display:flex; justify-content:space-between"><span>AAMIAINEN</span><span>1.00</span></div>
-                    <div style="display:flex; justify-content:space-between"><span>PUURO</span><span>1.00</span></div>
-                    <!-- Tähän listautuu tuotteet -->
-                </div>
-                <div class="status-tag">MANAGER [R]</div>
+                <div id="receipt-content"></div>
             </div>
+            
+            <div id="input-buffer">0</div>
 
-            <div id="numpad-area">
-                <!-- Rivi 1: Erikoistoiminnot -->
-                <div class="grid-btn c-green">ESC</div>
-                <div class="grid-btn c-gray">C</div>
-                <div class="grid-btn c-gray">X</div>
-                <div class="grid-btn c-blue">PLU</div>
-                <div class="grid-btn c-nav">OK</div>
-
-                <!-- Rivi 2-5: Numerot ja toimintoja -->
-                <div class="grid-btn c-black">LTK AUKI</div>
-                <div class="grid-btn c-num">7</div>
-                <div class="grid-btn c-num">8</div>
-                <div class="grid-btn c-num">9</div>
-                <div class="grid-btn c-green">TILA</div>
-
-                <div class="grid-btn c-black">KUITTI ON/OFF</div>
-                <div class="grid-btn c-num">4</div>
-                <div class="grid-btn c-num">5</div>
-                <div class="grid-btn c-num">6</div>
-                <div class="grid-btn c-gray">KUITTI MUISTIIN</div>
-
-                <div class="grid-btn c-black">KUITTI LASKU</div>
-                <div class="grid-btn c-num">1</div>
-                <div class="grid-btn c-num">2</div>
-                <div class="grid-btn c-num">3</div>
-                <div class="grid-btn c-gray">MAKSUPÄÄTE</div>
-
-                <div class="grid-btn c-black">MYYJÄ NRO</div>
-                <div class="grid-btn c-num">0</div>
-                <div class="grid-btn c-num">00</div>
-                <div class="grid-btn c-gray">-</div>
-                <div class="grid-btn c-gray"></div> <!-- Tyhjä -->
-                
-                <!-- Alarivi -->
-                <div class="grid-btn c-black double-width">KÄTEINEN</div>
-                <div style="grid-column: span 3"></div> <!-- Tyhjä tila -->
+            <div id="numpad">
+                <!-- RIVI 1 -->
+                <div class="grid-btn c-green" onclick="clearAll()">ESC</div>
+                <div class="grid-btn c-gray" onclick="clearBuffer()">C</div>
+                <div class="grid-btn c-red" onclick="voidLast()">POISTA</div>
+                <div class="grid-btn c-red" onclick="clearAll()">MITÄTÖI</div>
+                <div class="grid-btn c-red">PALAUTUS</div>
+                <!-- RIVI 2 -->
+                <div class="grid-btn c-gray" onclick="pressNum(7)">7</div>
+                <div class="grid-btn c-gray" onclick="pressNum(8)">8</div>
+                <div class="grid-btn c-gray" onclick="pressNum(9)">9</div>
+                <div class="grid-btn c-blue" onclick="applyDiscount('%')">ALE %</div>
+                <div class="grid-btn c-yellow" style="background:#a69e3a; color:black;">MYYJÄ</div>
+                <!-- RIVI 3 -->
+                <div class="grid-btn c-gray" onclick="pressNum(4)">4</div>
+                <div class="grid-btn c-gray" onclick="pressNum(5)">5</div>
+                <div class="grid-btn c-gray" onclick="pressNum(6)">6</div>
+                <div class="grid-btn c-blue" onclick="applyDiscount('-')">ALE €</div>
+                <div class="grid-btn c-nav" onclick="toggleMode('PGM')">PGM TILA</div>
+                <!-- RIVI 4 -->
+                <div class="grid-btn c-gray" onclick="pressNum(1)">1</div>
+                <div class="grid-btn c-gray" onclick="pressNum(2)">2</div>
+                <div class="grid-btn c-gray" onclick="pressNum(3)">3</div>
+                <div class="grid-btn c-green" style="grid-row: span 2;" onclick="showSubtotal()">VÄLI<br>SUMMA</div>
+                <div class="grid-btn c-blue" onclick="payCard()">KORTTI</div>
+                <!-- RIVI 5 -->
+                <div class="grid-btn c-gray" onclick="pressNum(0)">0</div>
+                <div class="grid-btn c-gray" onclick="pressNum('00')">00</div>
+                <div class="grid-btn c-gray" onclick="pressNum('.')">.</div>
+                <div class="grid-btn c-black" onclick="payCash()">KÄTEINEN</div>
             </div>
         </div>
 
-        <!-- OIKEA PUOLI: TUOTTEET -->
         <div id="product-grid">
-            <!-- Navigaatio (nuolet vasemmassa reunassa) -->
             <div class="grid-btn c-nav">▲</div>
-            <div class="grid-btn c-orange">AAMIAINEN</div>
-            <div class="grid-btn c-orange">KEITTO MUKAAN</div>
-            <div class="grid-btn c-orange">KEITTO LOUNAS</div>
-            <div class="grid-btn c-orange">RUOKA-ANNOS</div>
-            <div class="grid-btn c-orange">BUFFET LOUNAS</div>
-
-            <div class="grid-btn c-nav">△</div>
-            <div class="grid-btn c-orange">PUURO</div>
-            <div class="grid-btn c-orange">PIZZA, BURGER</div>
-            <div class="grid-btn c-orange">AVOIN MAKKAR</div>
-            <div class="grid-btn c-orange">AVOIN RUOKA</div>
-            <div class="grid-btn c-orange">AVOIN LOUNAS</div>
-
-            <div class="grid-btn c-blue">EAN HUUTOS</div>
-            <div class="grid-btn c-green">KAHVI</div>
-            <div class="grid-btn c-green">ISO KAHVI</div>
-            <div class="grid-btn c-green">TEE</div>
-            <div class="grid-btn c-orange">4€ KEITTOLOU</div>
-            <div class="grid-btn c-orange">5,50 € BUFFET</div>
-
+            <div class="grid-btn item-btn" style="background:#3b8c4a" data-price="8.50">KARHU 0.5</div>
+            <div class="grid-btn item-btn" style="background:#3b8c4a" data-price="8.00">LONKERO</div>
+            <div class="grid-btn item-btn" style="background:#3b8c4a" data-price="9.50">GIN TONIC</div>
+            <div class="grid-btn item-btn" style="background:#3b8c4a" data-price="12.00">COCKTAIL</div>
+            <div class="grid-btn item-btn" style="background:#3b8c4a" data-price="4.50">KAHVI</div>
+            
             <div class="grid-btn c-nav">▼</div>
-            <div class="grid-btn c-green">MAITO 0,5L</div>
-            <div class="grid-btn c-green">MAITO UHT 1L</div>
-            <div class="grid-btn c-green">SMUUTELORII</div>
-            <div class="grid-btn c-green">MEHUKEITTO</div>
-            <div class="grid-btn c-orange">AVOIN MAKKAR</div>
-
-            <div class="grid-btn c-nav">▽</div>
-            <div class="grid-btn c-pink">SÄMPYLÄ</div>
-            <div class="grid-btn c-pink">PULLA</div>
-            <div class="grid-btn c-pink">MUNKKIRINKEL</div>
-            <div class="grid-btn c-pink">HILLOMUNKKI</div>
-            <div class="grid-btn c-green">TÖLKKI LIMU</div>
-
-            <div class="grid-btn c-nav">▷</div>
-            <div class="grid-btn c-green">0,5 L LIMU P</div>
-            <div class="grid-btn c-green">1,5 L VIRVOIT</div>
-            <div class="grid-btn c-green">BATTERY</div>
-            <div class="grid-btn c-green">POWER KING E</div>
-            <div class="grid-btn c-green">PIENI TÖLKKI</div>
-
-            <!-- Loppupään tuotteet ja tasot -->
-            <div class="grid-btn c-black"></div>
-            <div class="grid-btn c-green">SNADI MEHUTE</div>
-            <div class="grid-btn c-blue">Messualennus</div>
-            <div class="grid-btn c-orange">KEKSIT SIPSI</div>
-            <div class="grid-btn c-orange">SALAATTI</div>
-            <div class="grid-btn c-orange">EINES</div>
-
-            <div class="grid-btn c-black"></div>
-            <div class="grid-btn c-pink">Päivän leipä</div>
-            <div class="grid-btn c-pink">KARKIT</div>
-            <div class="grid-btn c-pink">SUKLAA</div>
-            <div class="grid-btn c-pink">JÄÄTELÖ</div>
-            <div class="grid-btn c-blue">LAHJAKORTTI</div>
-
-            <div class="grid-btn c-black"></div>
-            <div class="grid-btn c-nav text-black">TASO 8</div>
-            <div class="grid-btn c-nav text-black">TASO 9</div>
-            <div class="grid-btn c-nav text-black">TASO 10</div>
-            <div class="grid-btn c-nav text-black">TASO 11</div>
-            <div class="grid-btn c-nav text-black">TASO 12</div>
+            <div class="grid-btn item-btn" style="background:#bf7339" data-price="12.50">SIIVET 10</div>
+            <div class="grid-btn item-btn" style="background:#bf7339" data-price="15.00">BURGER</div>
+            <div class="grid-btn item-btn" style="background:#bf7339" data-price="5.50">RANSKAL.</div>
+            <div class="grid-btn item-btn" style="background:#bf7339" data-price="18.90">BUFFET</div>
+            <div class="grid-btn item-btn" style="background:#bf7339" data-price="2.00">DIPPI</div>
         </div>
     </div>
 </div>
+
+<script>
+    let buffer = "";
+    let items = [];
+    let currentMode = "REG";
+    let editTarget = null;
+    let isReceiptShown = false;
+
+    const bufferEl = document.getElementById('input-buffer');
+    const receiptEl = document.getElementById('receipt-content');
+
+    // KELLO
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString('fi-FI');
+    }, 1000);
+
+    function pressNum(n) {
+        if(isReceiptShown) clearAll();
+        buffer += n;
+        bufferEl.innerText = buffer;
+        bufferEl.style.color = "#0f0";
+    }
+
+    function clearBuffer() {
+        buffer = "";
+        bufferEl.innerText = "0";
+    }
+
+    function clearAll() {
+        items = [];
+        buffer = "";
+        isReceiptShown = false;
+        receiptEl.innerHTML = "";
+        bufferEl.innerText = "0";
+        bufferEl.style.color = "#0f0";
+    }
+
+    function toggleMode(mode) {
+        currentMode = mode;
+        const overlay = document.getElementById('pgm-overlay');
+        const statusBar = document.getElementById('status-bar');
+        
+        if(mode === 'PGM') {
+            overlay.style.display = 'block';
+            statusBar.style.backgroundColor = '#8c3b3b';
+            document.getElementById('mode-text').innerText = "PGM MANAGER";
+        } else {
+            overlay.style.display = 'none';
+            statusBar.style.backgroundColor = '#33367c';
+            document.getElementById('mode-text').innerText = "REG MANAGER";
+            if(editTarget) editTarget.classList.remove('selected-for-edit');
+        }
+    }
+
+    // TUOTTEEN PAINAMINEN
+    document.querySelectorAll('.item-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if(currentMode === 'PGM') {
+                if(editTarget) editTarget.classList.remove('selected-for-edit');
+                editTarget = btn;
+                btn.classList.add('selected-for-edit');
+                document.getElementById('p-text').value = btn.innerText;
+                document.getElementById('p-price').value = btn.dataset.price;
+            } else {
+                if(isReceiptShown) clearAll();
+                const price = parseFloat(btn.dataset.price);
+                items.push({ name: btn.innerText, price: price });
+                bufferEl.innerText = `${btn.innerText} ${price.toFixed(2)}`;
+                updateDisplay();
+            }
+        });
+    });
+
+    function saveProduct() {
+        if(!editTarget) return;
+        editTarget.innerText = document.getElementById('p-text').value;
+        editTarget.dataset.price = document.getElementById('p-price').value;
+        editTarget.style.backgroundColor = document.getElementById('p-color').value;
+        alert("Tallennettu!");
+    }
+
+    function updateDisplay() {
+        if(isReceiptShown) return;
+        receiptEl.innerHTML = items.map(i => `
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                <span>${i.name}</span>
+                <span>${i.price.toFixed(2)}</span>
+            </div>
+        `).join('');
+        
+        const total = items.reduce((a, b) => a + b.price, 0);
+        receiptEl.innerHTML += `<div style="border-top:2px solid #000; margin-top:10px; font-weight:bold; text-align:right;">YHT: ${total.toFixed(2)} €</div>`;
+    }
+
+    function payCash() {
+        if(items.length === 0) return;
+        let total = items.reduce((a, b) => a + b.price, 0);
+        let rounded = Math.round(total * 20) / 20;
+        let received = buffer === "" ? rounded : parseFloat(buffer);
+        let change = received - rounded;
+
+        if(change >= 0) {
+            bufferEl.innerText = `TAKASIN -${change.toFixed(2)}`;
+            bufferEl.style.color = "#ffcc00";
+            printPaperReceipt("KÄTEINEN", received, change, rounded);
+        } else {
+            alert("Liian pieni summa!");
+        }
+    }
+
+    function payCard() {
+        if(items.length === 0) return;
+        const total = items.reduce((a, b) => a + b.price, 0);
+        const overlay = document.getElementById('terminal-overlay');
+        document.getElementById('term-sum').innerText = total.toFixed(2) + " €";
+        overlay.style.display = 'block';
+
+        setTimeout(() => document.getElementById('term-status').innerText = "KÄSITELLÄÄN...", 1500);
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.getElementById('term-status').innerText = "YHDISTETÄÄN...";
+            printPaperReceipt("KORTTI", total, 0, total);
+        }, 3500);
+    }
+
+    function printPaperReceipt(method, received, change, finalTotal) {
+        isReceiptShown = true;
+        let total = items.reduce((a, b) => a + b.price, 0);
+        let alv = finalTotal * 0.1935;
+
+        let html = `
+            <div class="paper-receipt">
+                <div style="text-align:center; font-weight:bold;">BAARI & CLUB</div>
+                <div style="text-align:center; font-size:12px;">ESPOO - FINLAND</div>
+                <hr>
+                <div style="font-size:12px;">${new Date().toLocaleString()}</div>
+                <hr>
+                ${items.map(i => `
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>${i.name}</span>
+                        <span>${i.price.toFixed(2)}</span>
+                    </div>
+                `).join('')}
+                <hr>
+                <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                    <span>YHTEENSÄ (EUR)</span>
+                    <span>${finalTotal.toFixed(2)}</span>
+                </div>
+                <div style="font-size:11px;">Sis. ALV 24%: ${alv.toFixed(2)}</div>
+                <hr>
+                <div style="display:flex; justify-content:space-between;">
+                    <span>${method}</span>
+                    <span>${received.toFixed(2)}</span>
+                </div>
+                ${change > 0 ? `
+                <div style="display:flex; justify-content:space-between;">
+                    <span>TAKASIN</span>
+                    <span>${change.toFixed(2)}</span>
+                </div>` : ''}
+                <hr>
+                <div style="text-align:center; margin-top:10px;">KIITOS KÄYNNISTÄ!</div>
+            </div>
+        `;
+        receiptEl.innerHTML = html;
+        buffer = "";
+    }
+
+    function voidLast() {
+        items.pop();
+        updateDisplay();
+    }
+
+    function applyDiscount(type) {
+        let val = parseFloat(buffer);
+        if(!val) return;
+        let total = items.reduce((a, b) => a + b.price, 0);
+        let disc = (type === '%') ? total * (val/100) : val;
+        items.push({ name: `ALE ${val}${type}`, price: -disc });
+        updateDisplay();
+        clearBuffer();
+    }
+</script>
 
 </body>
 </html>
