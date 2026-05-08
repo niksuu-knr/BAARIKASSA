@@ -2,31 +2,45 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Web-QT6000 POS Replica</title>
+    <title>Web-QT6000 POS Hifistelty</title>
     <style>
         :root {
+            /* Perusvärit */
             --casio-bg: #1a1a1a;
-            --screen-bg: #f0f0f0;
-            --status-bar-bg: #33367c; /* Tummanisininen yläpalkki */
-            --btn-gray: #4a4d4e;
-            --btn-light-gray: #7a7d7e;
-            --btn-blue: #3a5a8c;
-            --btn-green: #4a8c4a;
-            --btn-orange: #d48344;
-            --btn-pink: #d46a8c;
-            --border-color: #000;
+            --casio-border: #333;
+            --screen-bg: #e0e0e0;
+            --status-bar-bg: #33367c;
+            --text-color-white: white;
+            --text-color-black: black;
+
+            /* Painikkeiden "muoviset" värisävyt */
+            --btn-base-gray: #4a4d4e;
+            --btn-base-light-gray: #7a7d7e;
+            --btn-base-blue: #3a5a8c;
+            --btn-base-green: #3b8c4a;
+            --btn-base-orange: #bf7339;
+            --btn-base-pink: #b35976;
+            --btn-base-nav: #7a8c99;
+            --btn-base-yellow: #a69e3a;
+
+            /* "Bezel"-efekti (3D-reuna) */
+            --bezel-width: 3px;
+            --bezel-color-light: rgba(255,255,255,0.4);
+            --bezel-color-dark: rgba(0,0,0,0.5);
         }
 
         body {
             margin: 0;
             background-color: #000;
+            /* Käytetään tiiviimpää fonttia, joka matkii alkuperäistä näyttöä */
             font-family: 'Arial Narrow', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: white;
+            color: var(--text-color-white);
             user-select: none;
+            overflow: hidden; /* Estää vierityksen */
         }
 
         /* Pääkontti matkii monitoria */
@@ -34,92 +48,115 @@
             width: 1024px;
             height: 768px;
             background-color: var(--casio-bg);
-            border: 10px solid #333;
+            border: 15px solid var(--casio-border);
+            border-radius: 5px;
             display: grid;
-            grid-template-rows: 30px 1fr; /* Yläpalkki + sisältö */
-            padding: 5px;
-            gap: 5px;
+            grid-template-rows: 35px 1fr; /* Yläpalkki + sisältö */
+            padding: 8px;
+            gap: 10px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
 
-        /* Yläpalkki */
+        /* Yläpalkki (Reg Manager, Aika, jne.) */
         #status-bar {
             background-color: var(--status-bar-bg);
             display: flex;
             justify-content: space-between;
-            padding: 0 10px;
+            padding: 0 15px;
             align-items: center;
-            font-size: 14px;
-            border: 1px solid #555;
+            font-size: 16px;
+            border: 2px solid #555;
+            letter-spacing: 1px;
         }
 
         /* Pääsisältöalue */
         #main-layout {
             display: grid;
-            grid-template-columns: 450px 1fr; /* Vasen näyttö/numpad | Oikea tuoteristikko */
+            grid-template-columns: 460px 1fr; /* Vasen näyttö/numpad | Oikea tuoteristikko */
             gap: 10px;
         }
 
         /* Vasen sarake */
         #left-col {
             display: grid;
-            grid-template-rows: 250px 1fr;
+            grid-template-rows: 270px 1fr;
             gap: 10px;
         }
 
         /* Myyntinäyttö (Valkoinen alue) */
         #display-area {
             background-color: var(--screen-bg);
-            border: 3px solid #666;
-            color: #000;
+            border: 4px solid #666;
+            color: var(--text-color-black);
             display: flex;
             flex-direction: column;
             position: relative;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
         }
 
         .display-header {
             background: #cbd5e0;
-            padding: 5px;
+            padding: 8px;
             font-weight: bold;
-            border-bottom: 1px solid #999;
+            border-bottom: 2px solid #999;
             text-align: center;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
         }
 
         #receipt-content {
             flex-grow: 1;
             padding: 10px;
-            font-family: monospace;
-            font-size: 18px;
+            font-family: monospace; /* Tärkeä kuitille */
+            font-size: 20px;
+            line-height: 1.3;
         }
 
-        .manager-tag {
-            background: #e2e84e;
+        /* Kelta-vihreä status-palkki kuitin alla */
+        .status-tag {
+            background: linear-gradient(180deg, #e2e84e 0%, #a69e3a 100%);
             color: black;
-            padding: 2px 10px;
+            padding: 5px 15px;
             font-weight: bold;
             position: absolute;
             bottom: 0;
             width: 100%;
+            box-sizing: border-box;
+            border-top: 1px solid #999;
         }
 
-        /* Painikkeet yleisesti */
+        /* --- PAINIKKEIDEN HIOMINEN (Casio-look) --- */
         .grid-btn {
-            border: 2px solid var(--border-color);
-            border-radius: 2px;
-            color: white;
+            border-radius: 4px; /* Hieman pyöristetyt kulmat muoville */
+            color: var(--text-color-white);
             font-weight: bold;
-            font-size: 13px;
+            font-size: 14px;
             text-transform: uppercase;
             cursor: pointer;
-            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
+            padding: 5px;
+            transition: transform 0.05s, box-shadow 0.05s;
+
+            /* TÄRKEÄ 3D-EFEKTI (Bezel) */
+            border: var(--bezel-width) solid transparent;
+            border-top-color: var(--bezel-color-light);
+            border-left-color: var(--bezel-color-light);
+            border-bottom-color: var(--bezel-color-dark);
+            border-right-color: var(--bezel-color-dark);
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), 0 2px 3px rgba(0,0,0,0.4);
         }
 
         .grid-btn:active {
+            /* Painallusefektissä Bezel kääntyy */
+            border-top-color: var(--bezel-color-dark);
+            border-left-color: var(--bezel-color-dark);
+            border-bottom-color: var(--bezel-color-light);
+            border-right-color: var(--bezel-color-light);
             box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
-            transform: scale(0.98);
+            transform: translateY(1px);
         }
 
         /* Alaosan näppäimistö (Vasen ala) */
@@ -127,31 +164,31 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(6, 1fr);
-            gap: 4px;
+            gap: 6px; /* Hieman suurempi rako muovipainikkeiden välillä */
         }
 
         /* Oikean puolen tuoteristikko */
         #product-grid {
             display: grid;
-            grid-template-columns: 50px repeat(5, 1fr); /* Nuolet + 5 saraketta */
+            grid-template-columns: 55px repeat(5, 1fr); /* Nuolet + 5 saraketta */
             grid-template-rows: repeat(10, 1fr);
-            gap: 4px;
+            gap: 6px;
         }
 
-        /* Värikoodit kuvasta */
-        .c-gray { background-color: #555; }
-        .c-num { background-color: #6a7d8c; }
-        .c-green { background-color: #3b8c4a; }
-        .c-orange { background-color: #bf7339; }
-        .c-blue { background-color: #3a5a8c; }
-        .c-pink { background-color: #b35976; }
-        .c-yellow { background-color: #a69e3a; }
-        .c-black { background-color: #111; }
-        .c-red { background-color: #8c3b3b; }
-        .c-nav { background-color: #7a8c99; }
+        /* Värikoodit päivitetty vastaamaan image_6.png hiontaa */
+        .c-gray { background-color: var(--btn-base-gray); }
+        .c-num { background-color: var(--btn-base-gray); color: white; } /* Numerot harmaalla */
+        .c-green { background-color: var(--btn-base-green); }
+        .c-orange { background-color: var(--btn-base-orange); }
+        .c-blue { background-color: var(--btn-base-blue); }
+        .c-pink { background-color: var(--btn-base-pink); }
+        .c-nav { background-color: var(--btn-base-nav); } /* Nuolet pystyssä */
+        .c-black { background-color: #080808; border-color: #000; } /* Syvä musta */
+        .c-yellow { background-color: var(--btn-base-yellow); color: black; }
 
+        /* Erikoisasettelut */
         .double-width { grid-column: span 2; }
-        .double-height { grid-row: span 2; }
+        .text-black { color: black; } /* Joissain painikkeissa musta teksti */
 
     </style>
 </head>
@@ -170,9 +207,11 @@
             <div id="display-area">
                 <div class="display-header">MYYNTI</div>
                 <div id="receipt-content">
+                    <div style="display:flex; justify-content:space-between"><span>AAMIAINEN</span><span>1.00</span></div>
+                    <div style="display:flex; justify-content:space-between"><span>PUURO</span><span>1.00</span></div>
                     <!-- Tähän listautuu tuotteet -->
                 </div>
-                <div class="manager-tag">MANAGER [R]</div>
+                <div class="status-tag">MANAGER [R]</div>
             </div>
 
             <div id="numpad-area">
@@ -205,8 +244,12 @@
                 <div class="grid-btn c-black">MYYJÄ NRO</div>
                 <div class="grid-btn c-num">0</div>
                 <div class="grid-btn c-num">00</div>
-                <div class="grid-btn c-num">.</div>
+                <div class="grid-btn c-gray">-</div>
+                <div class="grid-btn c-gray"></div> <!-- Tyhjä -->
+                
+                <!-- Alarivi -->
                 <div class="grid-btn c-black double-width">KÄTEINEN</div>
+                <div style="grid-column: span 3"></div> <!-- Tyhjä tila -->
             </div>
         </div>
 
@@ -255,7 +298,7 @@
             <div class="grid-btn c-green">POWER KING E</div>
             <div class="grid-btn c-green">PIENI TÖLKKI</div>
 
-            <!-- Alarivit (esimerkkejä loppupuolelta) -->
+            <!-- Loppupään tuotteet ja tasot -->
             <div class="grid-btn c-black"></div>
             <div class="grid-btn c-green">SNADI MEHUTE</div>
             <div class="grid-btn c-blue">Messualennus</div>
@@ -271,33 +314,14 @@
             <div class="grid-btn c-blue">LAHJAKORTTI</div>
 
             <div class="grid-btn c-black"></div>
-            <div class="grid-btn c-nav">TASO 8</div>
-            <div class="grid-btn c-nav">TASO 9</div>
-            <div class="grid-btn c-nav">TASO 10</div>
-            <div class="grid-btn c-nav">TASO 11</div>
-            <div class="grid-btn c-nav">TASO 12</div>
+            <div class="grid-btn c-nav text-black">TASO 8</div>
+            <div class="grid-btn c-nav text-black">TASO 9</div>
+            <div class="grid-btn c-nav text-black">TASO 10</div>
+            <div class="grid-btn c-nav text-black">TASO 11</div>
+            <div class="grid-btn c-nav text-black">TASO 12</div>
         </div>
     </div>
 </div>
-
-<script>
-    // Tähän voi lisätä logiikan tuotteiden klikkaamiseen
-    const receipt = document.getElementById('receipt-content');
-    const buttons = document.querySelectorAll('.grid-btn');
-
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const name = btn.innerText;
-            if(name && !['▲','▼','OK','ESC'].includes(name)) {
-                const item = document.createElement('div');
-                item.style.display = 'flex';
-                item.style.justifyContent = 'space-between';
-                item.innerHTML = `<span>${name}</span><span>1.00</span>`;
-                receipt.appendChild(item);
-            }
-        });
-    });
-</script>
 
 </body>
 </html>
