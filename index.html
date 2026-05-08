@@ -2,153 +2,301 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Web-QT6600 POS</title>
+    <title>Web-QT6000 POS Replica</title>
     <style>
         :root {
-            --bg-color: #2e2e2e;
-            --sidebar-bg: #e0e0e0;
-            --btn-drink: #4a90e2;
-            --btn-spirit: #50e3c2;
-            --btn-function: #d0021b;
-            --btn-pay: #7ed321;
+            --casio-bg: #1a1a1a;
+            --screen-bg: #f0f0f0;
+            --status-bar-bg: #33367c; /* Tummanisininen yläpalkki */
+            --btn-gray: #4a4d4e;
+            --btn-light-gray: #7a7d7e;
+            --btn-blue: #3a5a8c;
+            --btn-green: #4a8c4a;
+            --btn-orange: #d48344;
+            --btn-pink: #d46a8c;
+            --border-color: #000;
         }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: var(--bg-color);
+            background-color: #000;
+            font-family: 'Arial Narrow', sans-serif;
             display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
-            overflow: hidden;
+            color: white;
+            user-select: none;
         }
 
-        /* Vasen puoli: Kuitti */
-        #receipt-panel {
-            width: 300px;
-            background: var(--sidebar-bg);
-            border-right: 4px solid #999;
+        /* Pääkontti matkii monitoria */
+        #pos-container {
+            width: 1024px;
+            height: 768px;
+            background-color: var(--casio-bg);
+            border: 10px solid #333;
+            display: grid;
+            grid-template-rows: 30px 1fr; /* Yläpalkki + sisältö */
+            padding: 5px;
+            gap: 5px;
+        }
+
+        /* Yläpalkki */
+        #status-bar {
+            background-color: var(--status-bar-bg);
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            align-items: center;
+            font-size: 14px;
+            border: 1px solid #555;
+        }
+
+        /* Pääsisältöalue */
+        #main-layout {
+            display: grid;
+            grid-template-columns: 450px 1fr; /* Vasen näyttö/numpad | Oikea tuoteristikko */
+            gap: 10px;
+        }
+
+        /* Vasen sarake */
+        #left-col {
+            display: grid;
+            grid-template-rows: 250px 1fr;
+            gap: 10px;
+        }
+
+        /* Myyntinäyttö (Valkoinen alue) */
+        #display-area {
+            background-color: var(--screen-bg);
+            border: 3px solid #666;
+            color: #000;
             display: flex;
             flex-direction: column;
-            padding: 10px;
+            position: relative;
         }
 
-        #receipt-list {
-            flex-grow: 1;
-            background: white;
-            border: 2px inset #ccc;
-            padding: 10px;
-            font-family: 'Courier New', monospace;
-            overflow-y: auto;
-        }
-
-        .total-display {
-            font-size: 2rem;
-            font-weight: bold;
-            text-align: right;
-            background: #000;
-            color: #0f0;
-            padding: 10px;
-            margin-top: 10px;
-        }
-
-        /* Oikea puoli: Näppäimistö */
-        #pos-grid {
-            flex-grow: 1;
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            grid-template-rows: repeat(6, 1fr);
-            gap: 5px;
+        .display-header {
+            background: #cbd5e0;
             padding: 5px;
+            font-weight: bold;
+            border-bottom: 1px solid #999;
+            text-align: center;
         }
 
-        .pos-button {
-            border: 3px outset #eee;
-            border-radius: 4px;
+        #receipt-content {
+            flex-grow: 1;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 18px;
+        }
+
+        .manager-tag {
+            background: #e2e84e;
+            color: black;
+            padding: 2px 10px;
+            font-weight: bold;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Painikkeet yleisesti */
+        .grid-btn {
+            border: 2px solid var(--border-color);
+            border-radius: 2px;
             color: white;
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 13px;
+            text-transform: uppercase;
             cursor: pointer;
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            transition: active 0.1s;
         }
 
-        .pos-button:active {
-            border-style: inset;
+        .grid-btn:active {
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
             transform: scale(0.98);
         }
 
-        /* Värit */
-        .beer { background-color: var(--btn-drink); }
-        .spirit { background-color: var(--btn-spirit); }
-        .func { background-color: #9b9b9b; }
-        .pay { background-color: var(--btn-pay); }
-        .cancel { background-color: var(--btn-function); }
+        /* Alaosan näppäimistö (Vasen ala) */
+        #numpad-area {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 4px;
+        }
+
+        /* Oikean puolen tuoteristikko */
+        #product-grid {
+            display: grid;
+            grid-template-columns: 50px repeat(5, 1fr); /* Nuolet + 5 saraketta */
+            grid-template-rows: repeat(10, 1fr);
+            gap: 4px;
+        }
+
+        /* Värikoodit kuvasta */
+        .c-gray { background-color: #555; }
+        .c-num { background-color: #6a7d8c; }
+        .c-green { background-color: #3b8c4a; }
+        .c-orange { background-color: #bf7339; }
+        .c-blue { background-color: #3a5a8c; }
+        .c-pink { background-color: #b35976; }
+        .c-yellow { background-color: #a69e3a; }
+        .c-black { background-color: #111; }
+        .c-red { background-color: #8c3b3b; }
+        .c-nav { background-color: #7a8c99; }
+
+        .double-width { grid-column: span 2; }
+        .double-height { grid-row: span 2; }
+
     </style>
 </head>
 <body>
 
-<div id="receipt-panel">
-    <h3>KUITTI</h3>
-    <div id="receipt-list">
-        <!-- Tuotteet tulevat tänne -->
+<div id="pos-container">
+    <div id="status-bar">
+        <span>REG MANAGER</span>
+        <span>16-02-18 09:21</span>
+        <span>000023</span>
     </div>
-    <div class="total-display" id="total-price">0.00 €</div>
-</div>
 
-<div id="pos-grid">
-    <!-- Esimerkkinäppäimet -->
-    <button class="pos-button beer" onclick="addItem('Karhu 0.5L', 8.50)">KARHU 0.5L</button>
-    <button class="pos-button beer" onclick="addItem('Lonkero', 7.50)">LONKERO</button>
-    <button class="pos-button spirit" onclick="addItem('GT', 12.00)">GIN TONIC</button>
-    <button class="pos-button spirit" onclick="addItem('Shot', 6.00)">JALLU SHOT</button>
-    <button class="pos-button beer" onclick="addItem('Siideri', 8.00)">SIIDERI</button>
-    <button class="pos-button func" onclick="location.reload()">CLEAR</button>
+    <div id="main-layout">
+        <!-- VASEN PUOLI -->
+        <div id="left-col">
+            <div id="display-area">
+                <div class="display-header">MYYNTI</div>
+                <div id="receipt-content">
+                    <!-- Tähän listautuu tuotteet -->
+                </div>
+                <div class="manager-tag">MANAGER [R]</div>
+            </div>
 
-    <!-- Tyhjiä ruutuja matkimaan Casio-asettelua -->
-    <button class="pos-button beer" onclick="addItem('IPA', 9.50)">IPA 0.4L</button>
-    <button class="pos-button beer" onclick="addItem('Viini 12cl', 9.00)">VIINI 12CL</button>
-    <button class="pos-button spirit" onclick="addItem('Vodka Soda', 11.00)">VODKA SODA</button>
-    <button class="pos-button func">PÖYTÄ</button>
-    <button class="pos-button func">MUUTOS</button>
-    <button class="pos-button cancel" onclick="clearLast()">KORJAA</button>
+            <div id="numpad-area">
+                <!-- Rivi 1: Erikoistoiminnot -->
+                <div class="grid-btn c-green">ESC</div>
+                <div class="grid-btn c-gray">C</div>
+                <div class="grid-btn c-gray">X</div>
+                <div class="grid-btn c-blue">PLU</div>
+                <div class="grid-btn c-nav">OK</div>
 
-    <!-- Alarivi -->
-    <div style="grid-column: span 4;"></div>
-    <button class="pos-button pay" style="grid-column: span 2; grid-row: span 2;" onclick="checkout()">KÄTEINEN / MAKSU</button>
+                <!-- Rivi 2-5: Numerot ja toimintoja -->
+                <div class="grid-btn c-black">LTK AUKI</div>
+                <div class="grid-btn c-num">7</div>
+                <div class="grid-btn c-num">8</div>
+                <div class="grid-btn c-num">9</div>
+                <div class="grid-btn c-green">TILA</div>
+
+                <div class="grid-btn c-black">KUITTI ON/OFF</div>
+                <div class="grid-btn c-num">4</div>
+                <div class="grid-btn c-num">5</div>
+                <div class="grid-btn c-num">6</div>
+                <div class="grid-btn c-gray">KUITTI MUISTIIN</div>
+
+                <div class="grid-btn c-black">KUITTI LASKU</div>
+                <div class="grid-btn c-num">1</div>
+                <div class="grid-btn c-num">2</div>
+                <div class="grid-btn c-num">3</div>
+                <div class="grid-btn c-gray">MAKSUPÄÄTE</div>
+
+                <div class="grid-btn c-black">MYYJÄ NRO</div>
+                <div class="grid-btn c-num">0</div>
+                <div class="grid-btn c-num">00</div>
+                <div class="grid-btn c-num">.</div>
+                <div class="grid-btn c-black double-width">KÄTEINEN</div>
+            </div>
+        </div>
+
+        <!-- OIKEA PUOLI: TUOTTEET -->
+        <div id="product-grid">
+            <!-- Navigaatio (nuolet vasemmassa reunassa) -->
+            <div class="grid-btn c-nav">▲</div>
+            <div class="grid-btn c-orange">AAMIAINEN</div>
+            <div class="grid-btn c-orange">KEITTO MUKAAN</div>
+            <div class="grid-btn c-orange">KEITTO LOUNAS</div>
+            <div class="grid-btn c-orange">RUOKA-ANNOS</div>
+            <div class="grid-btn c-orange">BUFFET LOUNAS</div>
+
+            <div class="grid-btn c-nav">△</div>
+            <div class="grid-btn c-orange">PUURO</div>
+            <div class="grid-btn c-orange">PIZZA, BURGER</div>
+            <div class="grid-btn c-orange">AVOIN MAKKAR</div>
+            <div class="grid-btn c-orange">AVOIN RUOKA</div>
+            <div class="grid-btn c-orange">AVOIN LOUNAS</div>
+
+            <div class="grid-btn c-blue">EAN HUUTOS</div>
+            <div class="grid-btn c-green">KAHVI</div>
+            <div class="grid-btn c-green">ISO KAHVI</div>
+            <div class="grid-btn c-green">TEE</div>
+            <div class="grid-btn c-orange">4€ KEITTOLOU</div>
+            <div class="grid-btn c-orange">5,50 € BUFFET</div>
+
+            <div class="grid-btn c-nav">▼</div>
+            <div class="grid-btn c-green">MAITO 0,5L</div>
+            <div class="grid-btn c-green">MAITO UHT 1L</div>
+            <div class="grid-btn c-green">SMUUTELORII</div>
+            <div class="grid-btn c-green">MEHUKEITTO</div>
+            <div class="grid-btn c-orange">AVOIN MAKKAR</div>
+
+            <div class="grid-btn c-nav">▽</div>
+            <div class="grid-btn c-pink">SÄMPYLÄ</div>
+            <div class="grid-btn c-pink">PULLA</div>
+            <div class="grid-btn c-pink">MUNKKIRINKEL</div>
+            <div class="grid-btn c-pink">HILLOMUNKKI</div>
+            <div class="grid-btn c-green">TÖLKKI LIMU</div>
+
+            <div class="grid-btn c-nav">▷</div>
+            <div class="grid-btn c-green">0,5 L LIMU P</div>
+            <div class="grid-btn c-green">1,5 L VIRVOIT</div>
+            <div class="grid-btn c-green">BATTERY</div>
+            <div class="grid-btn c-green">POWER KING E</div>
+            <div class="grid-btn c-green">PIENI TÖLKKI</div>
+
+            <!-- Alarivit (esimerkkejä loppupuolelta) -->
+            <div class="grid-btn c-black"></div>
+            <div class="grid-btn c-green">SNADI MEHUTE</div>
+            <div class="grid-btn c-blue">Messualennus</div>
+            <div class="grid-btn c-orange">KEKSIT SIPSI</div>
+            <div class="grid-btn c-orange">SALAATTI</div>
+            <div class="grid-btn c-orange">EINES</div>
+
+            <div class="grid-btn c-black"></div>
+            <div class="grid-btn c-pink">Päivän leipä</div>
+            <div class="grid-btn c-pink">KARKIT</div>
+            <div class="grid-btn c-pink">SUKLAA</div>
+            <div class="grid-btn c-pink">JÄÄTELÖ</div>
+            <div class="grid-btn c-blue">LAHJAKORTTI</div>
+
+            <div class="grid-btn c-black"></div>
+            <div class="grid-btn c-nav">TASO 8</div>
+            <div class="grid-btn c-nav">TASO 9</div>
+            <div class="grid-btn c-nav">TASO 10</div>
+            <div class="grid-btn c-nav">TASO 11</div>
+            <div class="grid-btn c-nav">TASO 12</div>
+        </div>
+    </div>
 </div>
 
 <script>
-    let total = 0;
-    const receiptList = document.getElementById('receipt-list');
-    const totalDisplay = document.getElementById('total-price');
+    // Tähän voi lisätä logiikan tuotteiden klikkaamiseen
+    const receipt = document.getElementById('receipt-content');
+    const buttons = document.querySelectorAll('.grid-btn');
 
-    function addItem(name, price) {
-        total += price;
-        const entry = document.createElement('div');
-        entry.innerHTML = `<span>${name}</span> <span style="float:right">${price.toFixed(2)}</span>`;
-        receiptList.appendChild(entry);
-        updateTotal();
-    }
-
-    function updateTotal() {
-        totalDisplay.innerText = `${total.toFixed(2)} €`;
-    }
-
-    function clearLast() {
-        // Yksinkertaistettu tyhjennys
-        receiptList.innerHTML = '';
-        total = 0;
-        updateTotal();
-    }
-
-    function checkout() {
-        if(total === 0) return;
-        alert("Maksu suoritettu: " + total.toFixed(2) + " €");
-        clearLast();
-    }
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const name = btn.innerText;
+            if(name && !['▲','▼','OK','ESC'].includes(name)) {
+                const item = document.createElement('div');
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.innerHTML = `<span>${name}</span><span>1.00</span>`;
+                receipt.appendChild(item);
+            }
+        });
+    });
 </script>
 
 </body>
