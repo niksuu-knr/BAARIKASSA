@@ -2,269 +2,282 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Web-QT6000 POS - Enterprise</title>
+    <title>Web-QT6000 Full Professional</title>
     <style>
         :root {
             --casio-bg: #1a1a1a;
             --screen-bg: #cbd5e0;
-            --btn-base-gray: #4a4d4e;
-            --btn-base-blue: #3a5a8c;
-            --btn-base-green: #3b8c4a;
-            --btn-base-red: #8c3b3b;
-            --bezel-light: rgba(255,255,255,0.3);
-            --bezel-dark: rgba(0,0,0,0.5);
+            --btn-gray: #4a4d4e;
+            --btn-blue: #3a5a8c;
+            --btn-green: #3b8c4a;
+            --btn-red: #8c3b3b;
+            --btn-yellow: #a69e3a;
         }
 
-        body { margin: 0; background: #000; font-family: 'Arial Narrow', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; user-select: none; }
-        #pos-container { width: 1024px; height: 768px; background: var(--casio-bg); border: 12px solid #333; display: grid; grid-template-rows: 35px 1fr; padding: 8px; gap: 10px; position: relative; }
+        body { margin: 0; background: #000; font-family: 'Arial Narrow', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; color: white; }
         
-        #status-bar { background: #33367c; display: flex; justify-content: space-between; padding: 0 15px; align-items: center; font-size: 16px; border: 2px solid #555; }
-        #main-layout { display: grid; grid-template-columns: 460px 1fr; gap: 10px; }
-        #left-col { display: flex; flex-direction: column; gap: 5px; }
+        #pos-container { width: 1200px; height: 800px; background: var(--casio-bg); border: 12px solid #333; display: grid; grid-template-columns: 1fr 320px; gap: 15px; padding: 15px; position: relative; }
 
-        #display-area { background: var(--screen-bg); height: 320px; border: 4px solid #666; color: black; overflow-y: auto; position: relative; }
-        #receipt-lines { padding: 10px; font-family: monospace; font-size: 16px; white-space: pre-wrap; }
+        /* VASEN PUOLI */
+        #ui-side { display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 8px; }
+        
+        #status-bar { background: #33367c; padding: 5px 15px; display: flex; justify-content: space-between; font-size: 14px; border: 1px solid #555; }
 
-        #input-buffer {
-            background: #000; color: #0f0; height: 50px; border: 2px solid #555;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 15px; font-family: 'Courier New', monospace; font-size: 28px; font-weight: bold;
+        #display-area { background: var(--screen-bg); height: 280px; border: 4px solid #666; color: black; font-family: monospace; padding: 10px; overflow-y: auto; }
+        
+        #input-buffer { 
+            background: #000; color: #0f0; height: 60px; border: 2px solid #555; 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 20px; font-size: 32px; font-family: 'Courier New', monospace;
         }
 
-        .grid-btn { border-radius: 4px; font-weight: bold; font-size: 13px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; border: 3px solid transparent; border-top-color: var(--bezel-light); border-left-color: var(--bezel-light); border-bottom-color: var(--bezel-dark); border-right-color: var(--bezel-dark); box-shadow: inset 1px 1px 2px rgba(255,255,255,0.1), 0 2px 3px rgba(0,0,0,0.4); color: white; }
-        .grid-btn:active { border-top-color: var(--bezel-dark); border-left-color: var(--bezel-dark); border-bottom-color: var(--bezel-light); border-right-color: var(--bezel-light); }
-        
-        #numpad { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr); gap: 5px; flex-grow: 1; }
-        
-        #right-col { display: grid; grid-template-rows: 1fr 120px; gap: 10px; }
-        #product-grid { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(8, 1fr); gap: 6px; }
-        #group-grid { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(2, 1fr); gap: 6px; border-top: 2px solid #555; padding-top: 5px; }
+        #numpad-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+        .btn { border-radius: 4px; border: 3px solid #555; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 13px; height: 50px; text-transform: uppercase; }
+        .btn:active { transform: translateY(2px); filter: brightness(1.2); }
 
-        #pgm-overlay { display: none; position: absolute; top: 45px; left: 8px; right: 8px; bottom: 8px; background: #2d3436; z-index: 100; padding: 20px; overflow-y: auto; color: white; }
-        .pgm-section { background: #3d4446; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .pgm-list { width: 100%; border-collapse: collapse; background: #fff; color: #000; margin-top: 10px; }
-        .pgm-list th, .pgm-list td { border: 1px solid #ccc; padding: 8px; text-align: left; cursor: pointer; }
-        .pgm-list tr.selected { background: #ffeaa7 !important; }
+        #product-area { display: grid; grid-template-rows: 1fr 80px; gap: 10px; height: 220px; }
+        #product-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; overflow-y: auto; }
+        #group-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; border-top: 2px solid #555; padding-top: 5px; }
 
-        #terminal-sim { display: none; position: absolute; top: 30%; left: 30%; width: 300px; background: #222; border: 5px solid #444; padding: 20px; text-align: center; z-index: 200; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
-        #terminal-screen { background: #5a7d5a; color: #000; font-family: monospace; padding: 10px; height: 80px; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 15px; }
+        /* OIKEA PUOLI: PAPERINAUHA */
+        #receipt-tape-container { background: #eee; border: 5px solid #222; height: 100%; overflow-y: auto; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
+        #receipt-tape { padding: 20px 15px; color: #111; font-family: 'Courier New', monospace; font-size: 13px; white-space: pre-wrap; }
+        .tape-cut { border-bottom: 2px dashed #999; margin: 15px 0; }
 
-        .c-gray { background: var(--btn-base-gray); }
-        .c-blue { background: var(--btn-base-blue); }
-        .c-green { background: var(--btn-base-green); }
-        .c-red { background: var(--btn-base-red); }
-        .c-yellow { background: #a69e3a; color: black; }
+        /* PGM OVERLAY */
+        #pgm-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #2d3436; z-index: 100; padding: 30px; box-sizing: border-box; overflow-y: auto; }
+        .pgm-table { width: 100%; border-collapse: collapse; background: white; color: black; margin-bottom: 20px; }
+        .pgm-table th, .pgm-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        .selected-row { background: #ffeaa7; }
+
+        /* TERMINAALI */
+        #term-sim { display: none; position: absolute; top: 30%; left: 25%; width: 300px; background: #222; border: 6px solid #444; padding: 20px; z-index: 200; text-align: center; }
+        #term-screen { background: #5a7d5a; color: #000; font-family: monospace; height: 60px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+        /* VÄRIT */
+        .c-gray { background: var(--btn-gray); }
+        .c-blue { background: var(--btn-blue); }
+        .c-green { background: var(--btn-green); }
+        .c-red { background: var(--btn-red); }
+        .c-yellow { background: var(--btn-yellow); color: black; }
         .c-black { background: #000; }
     </style>
 </head>
 <body>
 
 <div id="pos-container">
-    <div id="status-bar">
-        <span id="mode-text">REG MANAGER</span>
-        <span id="active-clerk">MYYJÄ: ---</span>
-        <span id="receipt-no-display">KUitti: 000000</span>
-        <span id="clock">00:00:00</span>
-    </div>
+    <div id="ui-side">
+        <div id="status-bar">
+            <span id="st-mode">MODE: REG</span>
+            <span id="st-clerk">MYYJÄ: ---</span>
+            <span id="st-time">00:00:00</span>
+        </div>
 
-    <div id="terminal-sim"><div id="terminal-screen">VALMISTELLAAN...</div></div>
+        <div id="display-area">
+            <div id="reg-screen">*** KIRJAUDU SISÄÄN ***</div>
+        </div>
 
-    <!-- PGM Tila & Raportit -->
-    <div id="pgm-overlay">
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <button class="grid-btn c-green" style="padding: 10px;" onclick="generateReport('X')">X-RAPORTTI</button>
-            <button class="grid-btn c-red" style="padding: 10px;" onclick="generateReport('Z')">Z-RAPORTTI</button>
-            <button class="grid-btn c-blue" style="padding: 10px;" onclick="exportData()">LATAA VARMUUSKOPIO (.JSON)</button>
+        <div id="input-buffer">
+            <span id="buffer-label">MYYNTI</span>
+            <span id="buffer-val">0.00</span>
         </div>
-        
-        <div class="pgm-section">
-            <h3>TUOTTEET</h3>
-            <table class="pgm-list"><thead><tr><th>Nimi</th><th>Hinta (€)</th><th>G-ID</th></tr></thead><tbody id="pgm-products-body"></tbody></table>
-            <button onclick="pgmAdd('prod')">LISÄÄ</button> <button onclick="pgmDel('prod')">POISTA</button>
-        </div>
-        <div class="pgm-section">
-            <h3>TUOTERYHMÄT</h3>
-            <table class="pgm-list"><thead><tr><th>ID</th><th>Nimi</th></tr></thead><tbody id="pgm-groups-body"></tbody></table>
-            <button onclick="pgmAdd('group')">LISÄÄ</button> <button onclick="pgmDel('group')">POISTA</button>
-        </div>
-        <button class="grid-btn c-red" style="width:100%; height:50px;" onclick="toggleMode('REG')">TALLENNA JA SULJE</button>
-    </div>
 
-    <div id="main-layout">
-        <div id="left-col">
-            <div id="display-area"><div id="receipt-lines"></div></div>
-            <div id="input-buffer"><span id="buffer-text">MYYNTI</span><span id="buffer-sum">0.00</span></div>
-            <div id="numpad">
-                <div class="grid-btn c-green" onclick="clearBuffer()">ESC</div>
-                <div class="grid-btn c-gray" onclick="clearBuffer()">C</div>
-                <div class="grid-btn c-red" onclick="voidLast()">POISTA</div>
-                <div class="grid-btn c-red" onclick="clearAll()">MITÄTÖI</div>
-                <div class="grid-btn c-red" id="btn-return" onclick="toggleReturn()">PALAUTUS</div>
-                <div class="grid-btn c-gray" onclick="num('7')">7</div><div class="grid-btn c-gray" onclick="num('8')">8</div><div class="grid-btn c-gray" onclick="num('9')">9</div><div class="grid-btn c-blue" onclick="applyDiscount('%')">ALE %</div><div class="grid-btn c-yellow" onclick="clerkLogin()">MYYJÄ</div>
-                <div class="grid-btn c-gray" onclick="num('4')">4</div><div class="grid-btn c-gray" onclick="num('5')">5</div><div class="grid-btn c-gray" onclick="num('6')">6</div><div class="grid-btn c-blue" onclick="applyDiscount('-')">ALE €</div><div class="grid-btn c-blue" onclick="toggleMode('PGM')">PGM TILA</div>
-                <div class="grid-btn c-gray" onclick="num('1')">1</div><div class="grid-btn c-gray" onclick="num('2')">2</div><div class="grid-btn c-gray" onclick="num('3')">3</div><div class="grid-btn c-green" style="grid-row: span 2;" onclick="showSubtotal()">VÄLISUMMA</div><div class="grid-btn c-blue" onclick="startCardPayment()">KORTTI</div>
-                <div class="grid-btn c-gray" onclick="num('0')">0</div><div class="grid-btn c-gray" onclick="num('00')">00</div><div class="grid-btn c-gray" onclick="num('.')">.</div><div class="grid-btn c-black" onclick="pay('KÄTEINEN')">KÄTEINEN</div>
-            </div>
-        </div>
-        <div id="right-col">
+        <div id="product-area">
             <div id="product-grid"></div>
             <div id="group-grid"></div>
         </div>
+
+        <div id="numpad-grid">
+            <div class="btn c-green" onclick="clearAll()">ESC</div>
+            <div class="btn c-gray" onclick="clearBuffer()">C</div>
+            <div class="btn c-red" onclick="voidLast()">POISTA</div>
+            <div class="btn c-red" id="btn-ret" onclick="toggleReturn()">PALAUTUS</div>
+            <div class="btn c-yellow" onclick="toggleMode()">PGM</div>
+
+            <div class="btn c-gray" onclick="num('7')">7</div><div class="btn c-gray" onclick="num('8')">8</div><div class="btn c-gray" onclick="num('9')">9</div><div class="btn c-blue">ALE %</div><div class="btn c-blue" onclick="clerkLogin()">MYYJÄ</div>
+            <div class="btn c-gray" onclick="num('4')">4</div><div class="btn c-gray" onclick="num('5')">5</div><div class="btn c-gray" onclick="num('6')">6</div><div class="btn c-blue">ALE €</div><div class="btn c-blue" onclick="report('X')">X-RAP</div>
+            <div class="btn c-gray" onclick="num('1')">1</div><div class="btn c-gray" onclick="num('2')">2</div><div class="btn c-gray" onclick="num('3')">3</div><div class="btn c-green" style="grid-row: span 2; height:105px" onclick="subtotal()">VÄLI<br>SUMMA</div><div class="btn c-blue" onclick="startCard()">KORTTI</div>
+            <div class="btn c-gray" onclick="num('0')">0</div><div class="btn c-gray" onclick="num('00')">00</div><div class="btn c-gray" style="opacity:0.3">.</div><div class="btn c-black" onclick="pay('KÄTEINEN')">KÄTEINEN</div>
+        </div>
+    </div>
+
+    <!-- NAUHA -->
+    <div id="receipt-tape-container">
+        <div id="receipt-tape">*** NAUHA ALKAA ***</div>
+    </div>
+
+    <!-- PGM TILAN HALLINTA -->
+    <div id="pgm-overlay">
+        <h1>PGM HALLINTA</h1>
+        <div style="display: flex; gap: 20px;">
+            <div style="flex: 1;">
+                <h3>TUOTTEET</h3>
+                <table class="pgm-table" id="pgm-prods"><thead><tr><th>Nimi</th><th>Hinta(s)</th><th>GID</th></tr></thead><tbody></tbody></table>
+                <button onclick="pgmAdd('prod')">LISÄÄ</button>
+            </div>
+            <div style="flex: 1;">
+                <h3>RYHMÄT</h3>
+                <table class="pgm-table" id="pgm-groups"><thead><tr><th>ID</th><th>Nimi</th></tr></thead><tbody></tbody></table>
+                <button onclick="pgmAdd('group')">LISÄÄ</button>
+                <h3>MYYJÄT</h3>
+                <table class="pgm-table" id="pgm-clerks"><thead><tr><th>ID</th><th>Nimi</th></tr></thead><tbody></tbody></table>
+                <button onclick="pgmAdd('clerk')">LISÄÄ</button>
+            </div>
+        </div>
+        <button class="btn c-red" style="width:100%; margin-top:20px;" onclick="toggleMode()">SULJE JA TALLENNA</button>
+    </div>
+
+    <!-- KORTTILAITE -->
+    <div id="term-sim">
+        <div id="term-screen">ODOTTAA...</div>
     </div>
 </div>
 
 <script>
-    // --- TIEDONHALLINTA ---
     let db = {
-        products: [{ name: "OLUT", price: 850, gid: 1 }],
-        groups: [{ id: 1, name: "JUOMAT", color: "#3b8c4a" }],
-        transactions: [], // Päivittäiset myynnit
-        zReports: [],      // Arkistoituneet Z-raportit
-        receiptNo: 1,
-        clerks: [{ id: "1234", name: "Kalle" }]
+        prods: [{name: "KAHVI", price: 250, gid: 1}, {name: "PULLA", price: 300, gid: 2}],
+        groups: [{id: 1, name: "JUOMAT", color: "#3a5a8c"}, {id: 2, name: "RUOAT", color: "#3b8c4a"}],
+        clerks: [{id: "1", name: "KALLE"}, {id: "2", name: "LIISA"}],
+        trans: [], receiptNo: 1
     };
 
-    function saveData() { localStorage.setItem('pos_data', JSON.stringify(db)); }
-    function loadData() {
-        const saved = localStorage.getItem('pos_data');
-        if (saved) db = JSON.parse(saved);
-        renderGroups(); renderProducts();
-        document.getElementById('receipt-no-display').innerText = `KUitti: ${String(db.receiptNo).padStart(6, '0')}`;
-    }
-
-    let buffer = ""; let items = []; let isReturn = false; let currentClerk = null; let currentGroupId = null; let selIdx = { prod: -1, group: -1 };
+    let cart = []; let buffer = ""; let currentClerk = null; let isReturn = false; let currentGid = null; let mode = "REG";
 
     function init() {
-        loadData();
-        setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString('fi-FI'), 1000);
+        const saved = localStorage.getItem('qt6000_full_db');
+        if(saved) db = JSON.parse(saved);
+        renderAll();
+        setInterval(() => { document.getElementById('st-time').innerText = new Date().toLocaleTimeString(); }, 1000);
     }
 
-    // --- RAPORTOINTI ---
-    function generateReport(type) {
-        let total = 0;
-        let counts = {};
-        db.transactions.forEach(t => {
-            total += t.total;
-            t.items.forEach(i => {
-                counts[i.name] = (counts[i.name] || 0) + i.price;
-            });
-        });
-
-        let reportText = `--- ${type}-RAPORTTI ---\nPVM: ${new Date().toLocaleString()}\n\n`;
-        for (let prod in counts) {
-            reportText += `${prod.padEnd(15)} ${counts[prod].toFixed(2)} €\n`;
-        }
-        reportText += `\nTOTAL: ${total.toFixed(2)} €`;
-
-        document.getElementById('receipt-lines').innerText = reportText;
-
-        if (type === 'Z') {
-            db.zReports.push({ date: new Date(), total: total, data: [...db.transactions] });
-            db.transactions = []; // Nollaa päivän myynnit
-            db.receiptNo = 1;
-            saveData();
-            alert("Päivä suljettu ja tallennettu.");
-        }
+    // --- LOGIIKKA ---
+    function num(v) { buffer += v; updateBuffer(); }
+    function updateBuffer() { 
+        const val = buffer === "" ? 0 : parseInt(buffer) / 100;
+        document.getElementById('buffer-val').innerText = val.toFixed(2);
     }
-
-    function exportData() {
-        const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `kassa_backup_${new Date().toLocaleDateString()}.json`;
-        a.click();
-    }
-
-    // --- KASSATOIMINNOT ---
-    function pay(method) {
-        if(items.length === 0) return;
-        const total = items.reduce((a,b) => a + b.price, 0);
-        db.transactions.push({ id: db.receiptNo, total: total, method: method, items: [...items], date: new Date() });
-        db.receiptNo++;
-        saveData();
-        document.getElementById('receipt-no-display').innerText = `KUitti: ${String(db.receiptNo).padStart(6, '0')}`;
-        clearAll();
-        document.getElementById('receipt-lines').innerText = "KIITOS KÄYNNISTÄ!";
-    }
-
-    function startCardPayment() {
-        if(items.length === 0) return;
-        const term = document.getElementById('terminal-sim');
-        term.style.display = 'block';
-        document.getElementById('terminal-screen').innerText = "LUE KORTTI\n" + items.reduce((a,b)=>a+b.price,0).toFixed(2) + " €";
-        setTimeout(() => { term.style.display = 'none'; pay('KORTTI'); }, 2500);
-    }
-
-    function num(v) { if (v === '.') return; buffer += v; updateBufferDisplay(); }
-    function updateBufferDisplay() { document.getElementById('buffer-sum').innerText = (buffer === "" ? 0 : parseInt(buffer)/100).toFixed(2); }
-    function addProduct(p) {
-        if(!currentClerk) return alert("KIRJAUDU!");
-        let price = (buffer !== "") ? parseInt(buffer)/100 : p.price/100;
-        if(isReturn) price = -Math.abs(price);
-        items.push({ name: p.name, price: price });
-        renderReceipt(); clearBuffer();
-    }
-
-    function renderReceipt() {
-        document.getElementById('receipt-lines').innerText = items.map(i => `${i.name.padEnd(18)} ${i.price.toFixed(2)}`).join('\n');
-    }
-
-    function filterByGroup(gid) { currentGroupId = gid; renderProducts(); }
-    function renderGroups() {
-        const grid = document.getElementById('group-grid'); grid.innerHTML = '<div class="grid-btn c-gray" onclick="filterByGroup(null)">KAIKKI</div>';
-        db.groups.forEach(g => {
-            const btn = document.createElement('div'); btn.className='grid-btn'; btn.style.background=g.color; btn.innerText=g.name;
-            btn.onclick=() => filterByGroup(g.id); grid.appendChild(btn);
-        });
-    }
-    function renderProducts() {
-        const grid = document.getElementById('product-grid'); grid.innerHTML = '';
-        const filtered = currentGroupId ? db.products.filter(p => p.gid == currentGroupId) : db.products;
-        filtered.forEach(p => {
-            const g = db.groups.find(x => x.id === p.gid);
-            const btn = document.createElement('div'); btn.className='grid-btn'; btn.style.background=g?g.color:'#4a';
-            btn.innerText=p.name; btn.onclick=() => addProduct(p); grid.appendChild(btn);
-        });
-    }
+    function clearBuffer() { buffer = ""; updateBuffer(); }
 
     function clerkLogin() {
         const c = db.clerks.find(x => x.id === buffer);
-        if(c) { currentClerk=c; document.getElementById('active-clerk').innerText=`MYYJÄ: ${c.name}`; clearBuffer(); }
+        if(c) { 
+            currentClerk = c; 
+            document.getElementById('st-clerk').innerText = `MYYJÄ: ${c.name}`;
+            document.getElementById('reg-screen').innerText = "VALMIS";
+            clearBuffer();
+        } else { alert("TUNTEMATON MYYJÄ"); }
     }
 
-    function toggleMode(m) {
-        document.getElementById('pgm-overlay').style.display = (m === 'PGM') ? 'block' : 'none';
-        if(m === 'PGM') renderPgmLists(); else { renderGroups(); renderProducts(); saveData(); }
+    function addProd(p) {
+        if(!currentClerk) return;
+        let price = (buffer !== "") ? parseInt(buffer)/100 : p.price/100;
+        if(isReturn) price = -Math.abs(price);
+        cart.push({name: p.name, price});
+        renderCart(); clearBuffer();
     }
 
-    function renderPgmLists() {
-        document.getElementById('pgm-products-body').innerHTML = db.products.map((p, i) => `<tr onclick="selIdx.prod=${i};renderPgmLists()" class="${selIdx.prod==i?'selected':''}"><td>${p.name}</td><td>${(p.price/100).toFixed(2)}</td><td>${p.gid}</td></tr>`).join('');
-        document.getElementById('pgm-groups-body').innerHTML = db.groups.map((g, i) => `<tr onclick="selIdx.group=${i};renderPgmLists()" class="${selIdx.group==i?'selected':''}"><td>${g.id}</td><td>${g.name}</td></tr>`).join('');
+    function renderCart() {
+        const screen = document.getElementById('reg-screen');
+        screen.innerHTML = cart.map(i => `<div>${i.name.padEnd(15)} ${i.price.toFixed(2).padStart(8)}</div>`).join('');
+        const total = cart.reduce((a,b) => a+b.price, 0);
+        document.getElementById('buffer-val').innerText = total.toFixed(2);
+        document.getElementById('buffer-label').innerText = "YHTEENSÄ";
+    }
+
+    function pay(method) {
+        if(cart.length === 0) return;
+        const total = cart.reduce((a,b)=>a+b.price,0);
+        
+        // Lisää nauhalle
+        let entry = `\n      *** KUitti ${String(db.receiptNo).padStart(5,'0')} ***\n`;
+        entry += `${new Date().toLocaleString()}\nMYYJÄ: ${currentClerk.name}\n----------------------------\n`;
+        cart.forEach(i => entry += `${i.name.padEnd(18)} ${i.price.toFixed(2).padStart(8)}\n`);
+        entry += `----------------------------\nTOTAL EUR ${total.toFixed(2).padStart(17)}\n`;
+        entry += `MAKSU: ${method}\n<div class="tape-cut"></div>`;
+        
+        const div = document.createElement('div'); div.innerHTML = entry;
+        document.getElementById('receipt-tape').appendChild(div);
+        
+        // Tallenna kantaan
+        db.trans.push({total, items: [...cart], method, date: new Date()});
+        db.receiptNo++;
+        save();
+        
+        // Nollaa
+        cart = []; isReturn = false; document.getElementById('btn-ret').style.background = "";
+        document.getElementById('reg-screen').innerText = "KIITOS - TERVETULOA";
+        const container = document.getElementById('receipt-tape-container');
+        container.scrollTop = container.scrollHeight;
+        clearBuffer();
+    }
+
+    function startCard() {
+        if(cart.length === 0) return;
+        const term = document.getElementById('term-sim');
+        const ts = document.getElementById('term-screen');
+        term.style.display = 'block';
+        ts.innerText = "YHTEYS...";
+        setTimeout(() => ts.innerText = "LUE KORTTI", 1000);
+        setTimeout(() => ts.innerText = "HYVÄKSYTTY", 2500);
+        setTimeout(() => { term.style.display = 'none'; pay('KORTTI'); }, 3500);
+    }
+
+    function report(type) {
+        let total = db.trans.reduce((a,b)=>a+b.total,0);
+        let r = `\n   *** ${type}-RAPORTTI ***\nMYYNTI YHTEENSÄ: ${total.toFixed(2)} EUR\n<div class="tape-cut"></div>`;
+        const div = document.createElement('div'); div.innerHTML = r;
+        document.getElementById('receipt-tape').appendChild(div);
+        if(type === 'Z') { db.trans = []; save(); }
+    }
+
+    // --- UI RENDERÖINTI ---
+    function renderAll() {
+        // Tuoteryhmät
+        const gGrid = document.getElementById('group-grid');
+        gGrid.innerHTML = '<div class="btn c-gray" onclick="filterG(null)">KAIKKI</div>';
+        db.groups.forEach(g => {
+            const b = document.createElement('div'); b.className = 'btn'; b.style.background = g.color;
+            b.innerText = g.name; b.onclick = () => filterG(g.id); gGrid.appendChild(b);
+        });
+        filterG(null);
+        renderPgm();
+    }
+
+    function filterG(id) {
+        currentGid = id;
+        const pGrid = document.getElementById('product-grid'); pGrid.innerHTML = '';
+        const list = id ? db.prods.filter(x => x.gid == id) : db.prods;
+        list.forEach(p => {
+            const b = document.createElement('div'); b.className = 'btn c-blue';
+            b.innerText = p.name; b.onclick = () => addProd(p); pGrid.appendChild(b);
+        });
+    }
+
+    function toggleMode() {
+        mode = (mode === "REG") ? "PGM" : "REG";
+        document.getElementById('pgm-overlay').style.display = (mode === "PGM") ? "block" : "none";
+        document.getElementById('st-mode').innerText = `MODE: ${mode}`;
+        if(mode === "REG") { renderAll(); save(); }
+    }
+
+    function renderPgm() {
+        document.querySelector('#pgm-prods tbody').innerHTML = db.prods.map(p => `<tr><td>${p.name}</td><td>${p.price}</td><td>${p.gid}</td></tr>`).join('');
+        document.querySelector('#pgm-groups tbody').innerHTML = db.groups.map(g => `<tr><td>${g.id}</td><td>${g.name}</td></tr>`).join('');
+        document.querySelector('#pgm-clerks tbody').innerHTML = db.clerks.map(c => `<tr><td>${c.id}</td><td>${c.name}</td></tr>`).join('');
     }
 
     function pgmAdd(type) {
-        if(type==='prod') {
-            const name = prompt("Nimi:"); const price = parseInt(prompt("Sentit:")); const gid = parseInt(prompt("G-ID:"));
-            if(name && price) db.products.push({name, price, gid});
-        } else {
-            const id = parseInt(prompt("ID:")); const name = prompt("Nimi:");
-            if(id && name) db.groups.push({id, name, color: '#'+Math.floor(Math.random()*16777215).toString(16)});
-        }
-        renderPgmLists();
-    }
-    
-    function pgmDel(type) {
-        let i = type === 'prod' ? selIdx.prod : selIdx.group;
-        if(i >= 0) { if(type==='prod') db.products.splice(i,1); else db.groups.splice(i,1); }
-        renderPgmLists();
+        if(type === 'prod') db.prods.push({name: prompt("Nimi"), price: parseInt(prompt("Hinta (sentit)")), gid: parseInt(prompt("Ryhmä ID"))});
+        if(type === 'group') db.groups.push({id: parseInt(prompt("ID")), name: prompt("Nimi"), color: '#'+Math.floor(Math.random()*16777215).toString(16)});
+        if(type === 'clerk') db.clerks.push({id: prompt("ID"), name: prompt("Nimi")});
+        renderPgm();
     }
 
-    function clearBuffer() { buffer = ""; document.getElementById('buffer-text').innerText = "MYYNTI"; updateBufferDisplay(); }
-    function clearAll() { items = []; isReturn = false; renderReceipt(); clearBuffer(); }
-    function showSubtotal() { document.getElementById('buffer-text').innerText = "VÄLISUMMA"; document.getElementById('buffer-sum').innerText = items.reduce((a,b)=>a+b.price,0).toFixed(2); }
-    function toggleReturn() { isReturn = !isReturn; document.getElementById('buffer-text').innerText = isReturn ? "PALAUTUS" : "MYYNTI"; }
-    function voidLast() { items.pop(); renderReceipt(); }
+    function save() { localStorage.setItem('qt6000_full_db', JSON.stringify(db)); }
+    function toggleReturn() { isReturn = !isReturn; document.getElementById('btn-ret').style.background = isReturn ? "yellow" : ""; }
+    function voidLast() { cart.pop(); renderCart(); }
+    function clearAll() { cart = []; clearBuffer(); renderCart(); }
+    function subtotal() { renderCart(); }
 
     init();
 </script>
