@@ -2,86 +2,86 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Web-QT6000 Pro - Enterprise Final</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web-QT6000 Pro - FIX BUILD</title>
     <style>
         :root {
             --pos-blue: #33367c; --screen-gray: #b0b8c0; --btn-num: #4a4d4e;
             --btn-red: #8c3b3b; --btn-blue: #3a5a8c; --btn-green: #3b8c4a;
             --btn-yellow: #a69e3a; --prod-brown: #8c583b; --btn-purple: #6a3b8c;
-            --btn-orange: #d35400; --btn-mixer: #2e4a3e; --btn-spirit: #5d4037;
+            --btn-mixer: #2e4a3e; --btn-spirit: #5d4037;
         }
-        body { margin: 0; background: #000; font-family: 'Arial Narrow', sans-serif; color: white; height: 100vh; overflow: hidden; }
+        body { margin: 0; background: #000; font-family: 'Arial Narrow', sans-serif; color: white; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         
-        #system-lock { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #lock-input { background: #222; border: 2px solid #555; color: #0f0; font-size: 32px; text-align: center; padding: 10px; border-radius: 5px; margin-top: 20px; width: 300px; }
+        /* LUKITUSRUUTU */
+        #system-lock { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #lock-input { background: #222; border: 2px solid #555; color: #0f0; font-size: 32px; text-align: center; padding: 15px; border-radius: 5px; width: 300px; margin-top: 20px; outline: none; }
 
-        #pos-container { display: none; grid-template-rows: 35px 1fr; height: 100vh; padding: 5px; gap: 5px; box-sizing: border-box; }
+        /* PÄÄNÄKYMÄ */
+        #pos-container { display: none; width: 100vw; height: 100vh; grid-template-rows: 35px 1fr; padding: 5px; gap: 5px; box-sizing: border-box; background: #111; }
         #status-bar { background: var(--pos-blue); display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; padding: 0 15px; font-size: 14px; border: 1px solid #444; }
 
         #main-layout { display: grid; grid-template-columns: 460px 1fr; gap: 10px; overflow: hidden; }
-        #left-col { display: flex; flex-direction: column; gap: 5px; height: 100%; }
-        #receipt-area { background: var(--screen-gray); height: 42%; border: 3px solid #555; color: #111; font-family: monospace; padding: 12px; overflow-y: auto; white-space: pre; font-size: 14px; line-height: 1.2; }
+        #left-col { display: flex; flex-direction: column; gap: 5px; }
+        #receipt-area { background: var(--screen-gray); height: 400px; border: 3px solid #555; color: #111; font-family: monospace; padding: 12px; overflow-y: auto; white-space: pre; font-size: 14px; line-height: 1.2; }
         
-        #input-line { background: #000; height: 80px; border: 3px solid #555; display: flex; flex-direction: column; justify-content: center; padding: 0 15px; }
-        #buf-msg { color: #0f0; font-size: 14px; text-transform: uppercase; margin-bottom: 2px; }
-        #buf-val { color: #0f0; font-size: 34px; font-weight: bold; text-align: right; }
+        #input-line { background: #000; height: 90px; border: 3px solid #555; display: flex; flex-direction: column; justify-content: center; padding: 0 15px; }
+        #buf-msg { color: #0f0; font-size: 16px; text-transform: uppercase; }
+        #buf-val { color: #0f0; font-size: 38px; font-weight: bold; text-align: right; }
 
         #keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; flex-grow: 1; }
         #product-area { display: grid; grid-template-rows: 1fr 160px; gap: 10px; height: 100%; }
-        #product-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 55px; gap: 6px; overflow-y: auto; padding-right: 5px; }
+        #product-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 55px; gap: 6px; overflow-y: auto; }
         #group-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 8px; border-top: 3px solid #444; padding-top: 10px; }
 
-        .btn { border-radius: 4px; border: 1px solid #333; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; font-size: 10px; text-transform: uppercase; padding: 5px; }
-        .btn:active { filter: brightness(1.4); }
+        .btn { border-radius: 4px; border: 1px solid #333; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; font-size: 11px; text-transform: uppercase; padding: 5px; user-select: none; }
+        .btn:active { filter: brightness(1.5); background: #777; }
         .c-num { background: var(--btn-num); font-size: 18px; }
         .c-red { background: var(--btn-red); }
         .c-blue { background: var(--btn-blue); }
         .c-green { background: var(--btn-green); }
         .c-yellow { background: var(--btn-yellow); color: #000; }
         .c-prod { background: var(--prod-brown); }
-        .c-mixer { background: var(--btn-mixer); border-color: #4CAF50; }
-        .c-spirit { background: var(--btn-spirit); border-color: #d35400; }
-        .c-promo { background: #1a5276; border: 2px solid #5dade2; }
+        .c-spirit { background: var(--btn-spirit); }
+        .c-promo { background: #1a5276; border: 1px solid #5dade2; }
         .active-group { border: 2px solid #0f0; background: #666; }
 
-        #pgm-overlay { display: none; position: absolute; z-index: 5000; inset: 15px; background: #111; border: 3px solid var(--btn-blue); padding: 20px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #444; padding: 8px; text-align: left; font-size: 12px; }
-        input, select { background: #222; color: #fff; border: 1px solid #555; padding: 10px; margin: 5px; }
+        #pgm-overlay { display: none; position: absolute; z-index: 5000; inset: 10px; background: #111; border: 2px solid var(--btn-blue); padding: 20px; overflow-y: auto; }
     </style>
 </head>
 <body>
 
 <div id="system-lock">
-    <h1>WEB-QT6000 ENTERPRISE</h1>
-    <input type="password" id="lock-input" placeholder="KOODI" onkeypress="checkUnlock(event)">
+    <h1 style="letter-spacing: 5px;">WEB-QT6000</h1>
+    <input type="password" id="lock-input" placeholder="SYÖTÄ KOODI" autocomplete="off">
+    <p style="color: #444; font-size: 12px; margin-top: 20px;">SYSTEM STATUS: ENCRYPTED</p>
 </div>
 
 <div id="pos-container">
     <div id="status-bar">
         <span id="st-clerk">MYYJÄ: -</span>
-        <span id="st-receipt" style="text-align:center">TRX: 10001</span>
-        <span id="st-time" style="text-align:right">00:00</span>
+        <span style="text-align:center">ENTERPRISE BUILD 2026</span>
+        <span id="st-time">00:00:00</span>
     </div>
 
     <div id="main-layout">
         <div id="left-col">
-            <div id="receipt-area">*** TERVETULOA ***</div>
+            <div id="receipt-area">KIRJAUDU SISÄÄN (1 + MYYJÄ)</div>
             <div id="input-line">
-                <div id="buf-msg">ODOTTAA...</div>
+                <div id="buf-msg">VALMIS</div>
                 <div id="buf-val">0.00</div>
             </div>
             <div id="keypad">
                 <div class="btn c-green" onclick="resetPOS()">ESC</div>
                 <div class="btn c-num" onclick="clearBuffer()">C</div>
                 <div class="btn c-red" onclick="voidLast()">POISTA</div>
-                <div class="btn c-red" onclick="voidFull()">MITÄTÖI</div>
-                <div class="btn c-purple" style="background:var(--btn-purple)" onclick="sellGiftCard()">MYY LAHJA</div>
+                <div class="btn c-red" onclick="voidFull()">VOID</div>
+                <div class="btn c-blue" onclick="togglePGM()">PGM</div>
                 
                 <div class="btn c-num" onclick="num('7')">7</div>
                 <div class="btn c-num" onclick="num('8')">8</div>
                 <div class="btn c-num" onclick="num('9')">9</div>
-                <div class="btn c-blue" onclick="togglePGM()">PGM</div>
+                <div class="btn c-blue" onclick="payCard()">KORTTI</div>
                 <div class="btn c-yellow" onclick="clerkLogin()">MYYJÄ</div>
                 
                 <div class="btn c-num" onclick="num('4')">4</div>
@@ -93,7 +93,7 @@
                 <div class="btn c-num" onclick="num('1')">1</div>
                 <div class="btn c-num" onclick="num('2')">2</div>
                 <div class="btn c-num" onclick="num('3')">3</div>
-                <div class="btn c-blue" onclick="payCard()">KORTTI</div>
+                <div class="btn c-purple" style="background:var(--btn-purple)" onclick="sellGiftCard()">MYY LAHJA</div>
                 
                 <div class="btn c-num" onclick="num('0')">0</div>
                 <div class="btn c-num" onclick="num('00')">00</div>
@@ -110,57 +110,51 @@
 </div>
 
 <div id="pgm-overlay">
-    <div style="display:flex; justify-content:space-between;">
-        <h2>PGM - TUOTEHALLINTA</h2>
-        <button class="btn c-red" style="width:100px" onclick="togglePGM()">SULJE</button>
-    </div>
-    <div style="background:#222; padding:15px; border-radius:5px;">
+    <h2>PGM - TUOTE JA RYHMÄ HALLINTA</h2>
+    <div style="background:#222; padding:15px; margin-bottom:20px;">
         <input type="text" id="p-name" placeholder="Tuotenimi">
-        <input type="number" id="p-price" placeholder="Hinta (snt)">
+        <input type="number" id="p-price" placeholder="Hinta snt">
         <select id="p-group"></select>
-        <button onclick="saveProduct()">LISÄÄ TUOTE</button>
+        <button onclick="saveProduct()">LISÄÄ</button>
     </div>
-    <table id="pgm-table"></table>
+    <table id="pgm-table" style="width:100%; border-collapse:collapse;"></table>
+    <button class="btn c-red" style="margin-top:20px; width:150px; height:40px;" onclick="togglePGM()">SULJE</button>
 </div>
 
 <script>
+    // TUOTETIETOKANTA
     let db = {
         prods: [
-            // OLUET (1)
-            {name:"KARHU 0.5L", price:700, gid:1}, {name:"SANDELS 0.5L", price:700, gid:1}, {name:"HEINEKEN", price:750, gid:1}, {name:"GUINNESS", price:950, gid:1},
-            // LONKEROT (2)
-            {name:"LONKERO ORIG", price:850, gid:2}, {name:"ANANAS LONK", price:850, gid:2},
-            // SIIDERIT (3)
+            {name:"KARHU 0.5L", price:700, gid:1}, {name:"SANDELS 0.5L", price:700, gid:1}, {name:"HEINEKEN", price:750, gid:1}, {name:"GUINNESS", price:950, gid:1}, {name:"CORONA", price:800, gid:1},
+            {name:"LONKERO ORIG", price:850, gid:2}, {name:"ANANAS LONK", price:850, gid:2}, {name:"KARPALO LONK", price:850, gid:2},
             {name:"HAPPY JOE", price:820, gid:3}, {name:"SOMMERSBY", price:800, gid:3},
-            // SHOTIT (4)
-            {name:"FISU", price:550, gid:4}, {name:"JÄGER", price:650, gid:4}, {name:"MINTTU", price:600, gid:4},
-            // COCKTAILS (5)
-            {name:"APEROL SPRITZ", price:1130, gid:5}, {name:"MOJITO", price:1250, gid:5}, {name:"VODKA REDBULL", price:990, gid:5},
-            // SPIRITS (6)
-            {name:"VODKA 4CL", price:700, gid:6}, {name:"GIN 4CL", price:750, gid:6}, {name:"JAMESON 4CL", price:850, gid:6},
-            // SOFT/WINE (7)
-            {name:"COLA", price:450, gid:7}, {name:"VIINI 16CL", price:800, gid:7},
-            // TOIMINTO/ALE (8)
-            {name:"KOMBO: OLUT+SHOTT", price:-200, gid:8, combo:["KARHU", "FISU"]},
-            {name:"HENKILÖKUNTA -3€", price:-300, gid:8}
+            {name:"FISU", price:550, gid:4}, {name:"JÄGER", price:650, gid:4}, {name:"MINTTU", price:600, gid:4}, {name:"SALMARI", price:600, gid:4},
+            {name:"APEROL SPRITZ", price:1130, gid:5}, {name:"MOJITO", price:1250, gid:5}, {name:"NEGRONI", price:1300, gid:5}, {name:"G&T", price:1100, gid:5},
+            {name:"VODKA 4CL", price:700, gid:6}, {name:"GIN 4CL", price:750, gid:6}, {name:"ROMMI 4CL", price:700, gid:6}, {name:"JAMESON 4CL", price:850, gid:6}, {name:"JACK DANIELS", price:900, gid:6},
+            {name:"COLA", price:450, gid:7}, {name:"VESI", price:300, gid:7}, {name:"TALON VIINI", price:800, gid:7},
+            {name:"KOMBO: OLUT+SHOT", price:-200, gid:8, combo:["KARHU", "FISU"]}, {name:"HENKILÖKUNTA ALE", price:-300, gid:8}, {name:"HAPPY HOUR -1€", price:-100, gid:8}
         ],
         groups: [
             {id:1, name:"OLUET"}, {id:2, name:"LONKEROT"}, {id:3, name:"SIIDERIT"}, {id:4, name:"SHOTIT"},
-            {id:5, name:"COCKTAILS"}, {id:6, name:"SPIRITS"}, {id:7, name:"SOFT/WINE"}, {id:8, name:"TOIMINTO/ALE"}
+            {id:5, name:"DRINKIT"}, {id:6, name:"VIINAT 4CL"}, {id:7, name:"MUUT"}, {id:8, name:"TOIMINTO/ALE"}
         ],
-        giftcards: {}, clerks: [{id:"1", name:"ADMIN"}], sysPass: "9461"
+        giftcards: {}, clerks: [{id:"1", name:"ADMIN"}], sysPass: "94610758"
     };
 
     let cart = []; let buffer = ""; let currentClerk = null; let activeG = 1; let isReturn = false;
 
-    function init() {
-        const saved = localStorage.getItem('qt6000_master');
-        if(saved) db = JSON.parse(saved);
-        renderUI();
-        setInterval(() => document.getElementById('st-time').innerText = new Date().toLocaleTimeString(), 1000);
-    }
-
-    function checkUnlock(e) { if(e.key==="Enter" && document.getElementById('lock-input').value === db.sysPass) { document.getElementById('system-lock').style.display="none"; document.getElementById('pos-container').style.display="grid"; } }
+    // LUKITUKSEN AVAUS
+    document.getElementById('lock-input').addEventListener('keypress', function(e) {
+        if(e.key === 'Enter') {
+            if(this.value === db.sysPass) {
+                document.getElementById('system-lock').style.display = 'none';
+                document.getElementById('pos-container').style.display = 'grid';
+            } else {
+                alert("VIRHEELLINEN KOODI");
+                this.value = "";
+            }
+        }
+    });
 
     function num(v) { buffer += v; updateDisplay(); }
     function clearBuffer() { buffer = ""; updateDisplay(); }
@@ -168,34 +162,19 @@
 
     function clerkLogin() {
         const c = db.clerks.find(x => x.id === buffer);
-        if(c) { 
-            currentClerk = c; 
-            document.getElementById('st-clerk').innerText = "MYYJÄ: " + c.name;
-            setMsg("MYYJÄ KIRJATTU", c.name);
-            clearBuffer(); 
-        }
+        if(c) { currentClerk = c; document.getElementById('st-clerk').innerText = "MYYJÄ: " + c.name; setMsg("VALMIS", "0.00"); clearBuffer(); }
     }
+
+    function setMsg(m1, m2) { document.getElementById('buf-msg').innerText = m1; document.getElementById('buf-val').innerText = m2; }
 
     function addProd(p) {
         if(!currentClerk) return alert("KIRJAUDU SISÄÄN!");
-        if(p.combo && !p.combo.every(req => cart.some(i => i.name.includes(req)))) {
-            return alert("KOMBO VAATII TUOTTEET: " + p.combo.join(" & "));
-        }
+        if(p.combo && !p.combo.every(req => cart.some(i => i.name.includes(req)))) return alert("KOMBO VAATII: " + p.combo.join(" & "));
         let price = p.price/100;
         if(isReturn) price = -Math.abs(price);
         cart.push({name: p.name, price: price});
         setMsg(p.name, price.toFixed(2));
         renderCart();
-    }
-
-    function setMsg(m1, m2) {
-        document.getElementById('buf-msg').innerText = m1;
-        document.getElementById('buf-val').innerText = m2;
-    }
-
-    function showSubtotal() {
-        let total = cart.reduce((a, b) => a + b.price, 0);
-        setMsg("VÄLISUMMA", total.toFixed(2));
     }
 
     function renderCart() {
@@ -205,22 +184,21 @@
         document.getElementById('receipt-area').innerText = txt;
     }
 
+    function showSubtotal() {
+        let total = cart.reduce((a, b) => a + b.price, 0);
+        setMsg("VÄLISUMMA", total.toFixed(2));
+    }
+
     function payCash() {
         let total = cart.reduce((a, b) => a + b.price, 0);
         let cash = buffer === "" ? total : parseInt(buffer)/100;
-        if(cash < total) return alert("LIIAN PIENI SUMMA!");
-        setMsg("VAIHTORAHA", (cash - total).toFixed(2));
+        if(cash < total) return alert("SUMMA PUUTTUU");
+        setMsg("VAIHTO", (cash - total).toFixed(2));
         alert("MAKSETTU KÄTEISELLÄ. VAIHTO: " + (cash - total).toFixed(2) + "€");
         completeSale();
     }
 
-    function payCard() {
-        if(cart.length===0) return;
-        setMsg("KORTTIMAKSU", "ODOTTAA...");
-        setTimeout(() => { alert("HYVÄKSYTTY"); completeSale(); }, 1000);
-    }
-
-    function completeSale() { cart = []; isReturn = false; clearBuffer(); renderCart(); }
+    function payCard() { if(cart.length>0) { alert("KORTTIMAKSU HYVÄKSYTTY"); completeSale(); } }
 
     function sellGiftCard() {
         let val = buffer==="" ? 50 : parseInt(buffer)/100;
@@ -228,7 +206,7 @@
         db.giftcards[code] = val;
         cart.push({name: "LAHJA "+code, price: val});
         setMsg("MYYTY LAHJA", val.toFixed(2));
-        renderCart(); clearBuffer(); save();
+        renderCart(); clearBuffer();
     }
 
     function payGiftCard() {
@@ -237,23 +215,17 @@
             let total = cart.reduce((a,b)=>a+b.price, 0);
             if(db.giftcards[code] >= total) {
                 db.giftcards[code] -= total;
-                alert("MAKSETTU. SALDO JÄLJELLÄ: " + db.giftcards[code].toFixed(2) + "€");
+                alert("MAKSETTU. SALDOA JÄLJELLÄ: " + db.giftcards[code].toFixed(2) + "€");
                 completeSale();
             } else { alert("SALDO EI RIITÄ!"); }
-            save();
         }
     }
 
-    // PGM
-    function saveProduct() {
-        let n = document.getElementById('p-name').value;
-        let p = parseInt(document.getElementById('p-price').value);
-        let g = parseInt(document.getElementById('p-group').value);
-        if(n && p) { db.prods.push({name:n, price:p, gid:g}); save(); renderUI(); }
-    }
-    function removeProd(i) { db.prods.splice(i, 1); save(); renderUI(); }
-    function save() { localStorage.setItem('qt6000_master', JSON.stringify(db)); }
-    function togglePGM() { let o = document.getElementById('pgm-overlay'); o.style.display = o.style.display==="block"?"none":"block"; }
+    function completeSale() { cart = []; isReturn = false; clearBuffer(); renderCart(); }
+    function resetPOS() { cart = []; isReturn = false; clearBuffer(); renderCart(); setMsg("VALMIS", "0.00"); }
+    function voidLast() { cart.pop(); renderCart(); }
+    function voidFull() { if(confirm("TYHJENNÄ KUITTI?")) resetPOS(); }
+    function toggleReturn() { isReturn = !isReturn; document.getElementById('btn-ret').style.background = isReturn?"yellow":""; }
 
     function renderUI() {
         document.getElementById('product-grid').innerHTML = db.prods.filter(p => p.gid == activeG).map(p => `
@@ -263,15 +235,21 @@
             <div class="btn c-group ${g.id == activeG ? 'active-group' : ''}" onclick="activeG=${g.id};renderUI()">${g.name}</div>
         `).join('');
         document.getElementById('p-group').innerHTML = db.groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
-        document.getElementById('pgm-table').innerHTML = db.prods.map((p,i) => `<tr><td>${p.name}</td><td>${p.price/100}€</td><td><button onclick="removeProd(${i})">POISTA</button></td></tr>`).join('');
+        document.getElementById('pgm-table').innerHTML = db.prods.map((p,i) => `<tr><td>${p.name}</td><td>${p.price/100}€</td><td><button onclick="removeProd(${i})">X</button></td></tr>`).join('');
     }
 
-    function resetPOS() { cart = []; isReturn = false; clearBuffer(); renderCart(); setMsg("VALMIS", "0.00"); }
-    function voidLast() { cart.pop(); renderCart(); showSubtotal(); }
-    function voidFull() { if(confirm("TYHJENNÄ?")) resetPOS(); }
-    function toggleReturn() { isReturn = !isReturn; document.getElementById('btn-ret').style.background = isReturn?"yellow":""; }
+    function saveProduct() {
+        let n = document.getElementById('p-name').value;
+        let p = parseInt(document.getElementById('p-price').value);
+        let g = parseInt(document.getElementById('p-group').value);
+        if(n && p) { db.prods.push({name:n, price:p, gid:g}); renderUI(); }
+    }
+    function removeProd(i) { db.prods.splice(i, 1); renderUI(); }
+    function togglePGM() { let o = document.getElementById('pgm-overlay'); o.style.display = o.style.display==="block"?"none":"block"; }
 
-    init();
+    setInterval(() => document.getElementById('st-time').innerText = new Date().toLocaleTimeString('fi-FI'), 1000);
+    renderUI();
 </script>
+
 </body>
 </html>
