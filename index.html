@@ -2,314 +2,376 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Web-QT6000 Pro - ENTERPRISE V8</title>
+    <title>Web-QT6000 Pro - V13 ENTERPRISE FULL</title>
     <style>
         :root {
-            --pos-blue: #33367c; --screen-gray: #b0b8c0; --btn-num: #4a4d4e;
-            --btn-red: #8c3b3b; --btn-blue: #3a5a8c; --btn-green: #3b8c4a;
-            --btn-yellow: #a69e3a; --prod-brown: #8c583b; --btn-purple: #6a3b8c;
-            --btn-mixer: #2e4a3e; --btn-spirit: #5d4037;
+            --pos-blue: #1c2331; --screen-gray: #b0b8c0; --btn-num: #37474f;
+            --btn-red: #c62828; --btn-blue: #1565c0; --btn-green: #2e7d32;
+            --btn-yellow: #f9a825; --prod-brown: #5d4037; --btn-promo: #00838f;
+            --btn-purple: #6a1b9a; --ui-font: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-        body { margin: 0; background: #000; font-family: 'Arial Narrow', sans-serif; color: white; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        body { margin: 0; background: #000; font-family: var(--ui-font); color: white; height: 100vh; overflow: hidden; }
         
-        #system-lock { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #lock-input { background: #111; border: 2px solid #444; color: #0f0; font-size: 40px; text-align: center; padding: 15px; width: 300px; border-radius: 10px; outline: none; }
+        /* ALOITUSRUUTU */
+        #system-lock { position: fixed; inset: 0; background: radial-gradient(circle, #222 0%, #000 100%); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #lock-input { background: #111; border: 3px solid #444; color: #0f0; font-size: 50px; text-align: center; padding: 20px; width: 350px; border-radius: 15px; box-shadow: 0 0 20px rgba(0,255,0,0.2); outline: none; }
 
-        #term-sim { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9000; align-items: center; justify-content: center; }
-        .term-box { background: #222; border: 4px solid #555; width: 320px; padding: 25px; border-radius: 15px; text-align: center; color: #fff; font-family: 'Courier New', monospace; }
-        .term-screen { background: #040; border: 2px solid #080; height: 120px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #0f0; }
+        /* MAKSUPÄÄTE-POPUP */
+        #term-sim { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .term-box { background: #333; border: 5px solid #666; width: 350px; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .term-screen { background: #050; border: 4px solid #080; height: 140px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #0f0; font-family: monospace; border-radius: 10px; }
 
-        #pos-container { display: none; width: 100vw; height: 100vh; grid-template-rows: 35px 1fr; padding: 5px; gap: 5px; box-sizing: border-box; }
-        #status-bar { background: var(--pos-blue); display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; padding: 0 15px; font-size: 14px; border: 1px solid #444; }
+        /* PÄÄNÄKYMÄ */
+        #pos-container { display: none; width: 100vw; height: 100vh; grid-template-rows: 45px 1fr; padding: 5px; gap: 5px; box-sizing: border-box; }
+        #status-bar { background: var(--pos-blue); display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; padding: 0 20px; font-size: 15px; border-bottom: 2px solid #000; font-weight: bold; }
 
-        #main-layout { display: grid; grid-template-columns: 460px 1fr; gap: 10px; overflow: hidden; }
-        #left-col { display: flex; flex-direction: column; gap: 5px; height: 100%; }
+        #main-layout { display: grid; grid-template-columns: 440px 1fr 140px; gap: 10px; height: calc(100vh - 65px); overflow: hidden; }
         
-        #receipt-area { background: var(--screen-gray); height: 42%; border: 3px solid #555; color: #111; font-family: monospace; padding: 12px; overflow-y: auto; white-space: pre; font-size: 14px; line-height: 1.1; }
+        /* VASEN: KUITTI & NÄPPIS */
+        #left-col { display: flex; flex-direction: column; gap: 8px; }
+        #receipt-area { background: var(--screen-gray); flex-grow: 1; border: 4px solid #555; color: #000; font-family: 'Courier New', monospace; padding: 15px; overflow-y: auto; white-space: pre; font-size: 15px; line-height: 1.2; box-shadow: inset 0 0 15px rgba(0,0,0,0.4); }
+        #input-line { background: #000; height: 90px; border: 3px solid #555; display: flex; flex-direction: column; justify-content: center; padding: 0 20px; border-radius: 5px; }
+        #buf-val { color: #0f0; font-size: 44px; font-weight: bold; text-align: right; text-shadow: 0 0 10px rgba(0,255,0,0.5); }
+
+        #keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; height: 420px; }
+
+        /* KESKI: TUOTTEET */
+        #product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); grid-auto-rows: 115px; gap: 10px; overflow-y: auto; padding: 5px; background: #111; border-radius: 8px; }
+
+        /* OIKEA: RYHMÄT */
+        #group-grid { display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+
+        /* PAINIKKEET */
+        .btn { border-radius: 6px; border: 1px solid #222; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; user-select: none; transition: 0.1s; font-size: 13px; box-shadow: 0 3px 0 #000; }
+        .btn:active { transform: translateY(3px); box-shadow: none; filter: brightness(1.5); }
         
-        #input-line { background: #000; height: 100px; border: 3px solid #555; display: flex; flex-direction: column; justify-content: center; padding: 0 15px; }
-        #buf-msg { color: #0f0; font-size: 18px; text-transform: uppercase; }
-        #buf-val { color: #0f0; font-size: 44px; font-weight: bold; text-align: right; }
-
-        #keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; flex-grow: 1; }
-        #product-area { display: grid; grid-template-rows: 1fr 160px; gap: 10px; height: 100%; }
-        #product-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 50px; gap: 5px; overflow-y: auto; }
-        #group-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 8px; border-top: 3px solid #444; padding-top: 10px; }
-
-        .btn { border-radius: 4px; border: 1px solid #333; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; font-size: 10px; text-transform: uppercase; user-select: none; }
-        .btn:active { filter: brightness(1.6); }
-        .c-num { background: var(--btn-num); font-size: 20px; }
+        .c-num { background: var(--btn-num); font-size: 26px; }
         .c-red { background: var(--btn-red); }
-        .c-blue { background: var(--btn-blue); }
         .c-green { background: var(--btn-green); }
         .c-yellow { background: var(--btn-yellow); color: #000; }
-        .c-prod { background: var(--prod-brown); }
-        .c-mixer { background: var(--btn-mixer); font-size: 9px; }
-        .c-spirit { background: var(--btn-spirit); }
-        .c-promo { background: #1a5276; border: 1px solid #5dade2; }
-        .active-group { border: 2px solid #0f0; background: #555; }
+        .c-blue { background: var(--btn-blue); }
+        .c-purple { background: var(--btn-purple); }
+        
+        .c-prod { background: var(--prod-brown); flex-direction: column; padding: 10px; font-size: 12px; }
+        .c-promo-btn { background: var(--btn-promo); border: 1px solid #4dd0e1; }
+        
+        .c-group { background: #37474f; font-size: 11px; min-height: 55px; border-left: 5px solid #263238; }
+        .active-group { border-left-color: #0f0; background: #455a64; box-shadow: 0 0 10px rgba(0,255,0,0.3); }
 
-        #pgm-overlay { display: none; position: absolute; z-index: 11000; inset: 15px; background: #111; border: 2px solid var(--btn-blue); padding: 20px; overflow-y: auto; }
+        /* PGM */
+        #pgm-overlay { display: none; position: absolute; z-index: 11000; inset: 20px; background: #1a1a1a; flex-direction: column; border: 3px solid var(--btn-blue); border-radius: 10px; }
+        .pgm-tabs { display: flex; background: #263238; border-radius: 7px 7px 0 0; }
+        .tab-btn { padding: 18px 25px; cursor: pointer; color: #90a4ae; border: none; background: none; font-weight: bold; }
+        .tab-btn.active { background: var(--btn-blue); color: #fff; }
+        .pgm-content { flex-grow: 1; padding: 25px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #333; color: var(--btn-yellow); }
+        th, td { border: 1px solid #444; padding: 12px; text-align: left; }
     </style>
 </head>
 <body>
 
 <div id="system-lock">
-    <h1 style="letter-spacing: 10px; color: #555;">QT-6000 PRO</h1>
-    <input type="password" id="lock-input" placeholder="ACCESS CODE" autocomplete="off">
+    <div style="font-size: 14px; color: #888; margin-bottom: 10px;">AUTHORIZED PERSONNEL ONLY</div>
+    <h1 style="letter-spacing: 8px; margin-bottom: 20px;">QT-6000 ENTERPRISE</h1>
+    <input type="password" id="lock-input" placeholder="PASSCODE" autocomplete="off">
 </div>
 
 <div id="term-sim">
     <div class="term-box">
-        <div class="term-screen" id="term-display">
-            <div>YHTEENSÄ</div>
-            <div id="term-sum" style="font-size: 28px;">0.00 €</div>
-            <div id="term-status" style="margin-top:10px; font-size: 14px;">ODOTTAA KORTTIA...</div>
+        <div class="term-screen">
+            <div id="term-sum" style="font-size: 32px; font-weight: bold;">0.00 €</div>
+            <div id="term-status" style="margin-top:15px; font-size: 16px;">INSERT CARD</div>
         </div>
-        <div style="font-size: 11px; color: #888;">SYÖTÄ KORTTI TAI LÄHIMAKSU</div>
+        <div style="font-size: 12px; color: #aaa; letter-spacing: 2px;">PAYMENT TERMINAL V4.0</div>
     </div>
 </div>
 
 <div id="pos-container">
     <div id="status-bar">
-        <span id="st-clerk">MYYJÄ: -</span>
-        <span style="text-align:center">ENTERPRISE SYSTEM V8.0</span>
+        <span id="st-clerk">CLERK: NOT LOGGED</span>
+        <span style="text-align:center">QT-6000 MASTER V13.0.4</span>
         <span id="st-time">00:00:00</span>
     </div>
 
     <div id="main-layout">
         <div id="left-col">
-            <div id="receipt-area">VALMIS</div>
-            <div id="input-line">
-                <div id="buf-msg">ODOTTAA</div>
-                <div id="buf-val">0.00</div>
-            </div>
+            <div id="receipt-area">READY</div>
+            <div id="input-line"><div id="buf-val">0.00</div></div>
             <div id="keypad">
-                <div class="btn c-green" onclick="resetPOS()">ESC</div>
+                <div class="btn c-red" onclick="resetPOS()">ESC</div>
                 <div class="btn c-num" onclick="clearBuffer()">C</div>
-                <div class="btn c-red" onclick="voidLast()">POISTA</div>
-                <div class="btn c-red" onclick="voidFull()">VOID</div>
                 <div class="btn c-blue" onclick="togglePGM()">PGM</div>
-                
+                <div class="btn c-red" onclick="voidLast()">VOID</div>
+
                 <div class="btn c-num" onclick="num('7')">7</div>
                 <div class="btn c-num" onclick="num('8')">8</div>
                 <div class="btn c-num" onclick="num('9')">9</div>
-                <div class="btn c-blue" onclick="processCard()">KORTTI</div>
-                <div class="btn c-yellow" onclick="clerkLogin()">MYYJÄ</div>
+                <div class="btn c-yellow" style="font-size: 28px;" onclick="multiplier()">X</div>
                 
                 <div class="btn c-num" onclick="num('4')">4</div>
                 <div class="btn c-num" onclick="num('5')">5</div>
                 <div class="btn c-num" onclick="num('6')">6</div>
-                <div class="btn c-green" style="grid-row: span 2" onclick="showSubtotal()">VÄLI<br>SUMMA</div>
-                <div class="btn c-yellow" style="font-size: 24px;" onclick="multiplier()">X</div>
+                <div class="btn c-yellow" onclick="clerkLogin()">CLERK</div>
                 
                 <div class="btn c-num" onclick="num('1')">1</div>
                 <div class="btn c-num" onclick="num('2')">2</div>
                 <div class="btn c-num" onclick="num('3')">3</div>
-                <div class="btn c-purple" style="background:var(--btn-purple)" onclick="sellGiftCard()">MYY LAHJA</div>
-                <div class="btn c-purple" style="background:var(--btn-purple)" onclick="payGiftCard()">L-MAKSU</div>
+                <div class="btn c-blue" style="background:#0d47a1" onclick="processCard()">CARD</div>
                 
                 <div class="btn c-num" onclick="num('0')">0</div>
                 <div class="btn c-num" onclick="num('00')">00</div>
-                <div class="btn c-red" id="btn-ret" onclick="toggleReturn()">PALAUTUS</div>
-                <div class="btn c-green" style="grid-column: span 2" onclick="payCash()">KÄTEINEN</div>
+                <div class="btn c-green" onclick="showSubtotal()">SUBT.</div>
+                <div class="btn c-green" style="background: #1b5e20; border: 2px solid #fff; font-size: 16px;" onclick="payCash()">CASH</div>
+
+                <div class="btn c-red" id="btn-ret" onclick="toggleReturn()">REFUND</div>
+                <div class="btn c-purple" onclick="sellGiftCard()">M-GIFT</div>
+                <div class="btn c-purple" onclick="payGiftCard()">L-PAY</div>
+                <div class="btn c-red" style="background:#222" onclick="cart=[];updateReceipt();">CLEAR</div>
             </div>
         </div>
 
-        <div id="product-area">
-            <div id="product-grid"></div>
-            <div id="group-grid"></div>
-        </div>
+        <div id="product-grid"></div>
+        <div id="group-grid"></div>
     </div>
 </div>
 
 <div id="pgm-overlay">
-    <h2>PGM - TUOTEHALLINTA</h2>
-    <div style="background:#222; padding:15px; margin-bottom:20px;">
-        <input type="text" id="p-name" placeholder="Nimi">
-        <input type="number" id="p-price" placeholder="Hinta (snt)">
-        <select id="p-group"></select>
-        <button onclick="saveProduct()">LISÄÄ TUOTE</button>
+    <div class="pgm-tabs">
+        <div class="tab-btn active" onclick="showTab('p')">PRODUCTS (PLU)</div>
+        <div class="tab-btn" onclick="showTab('g')">DEPARTMENTS</div>
+        <div class="tab-btn" onclick="showTab('m')">CLERKS</div>
+        <div class="tab-btn" style="margin-left:auto; background:#b71c1c" onclick="togglePGM()">EXIT PGM</div>
     </div>
-    <div id="pgm-list"></div>
-    <button class="btn c-red" style="width:120px; height:40px; margin-top:20px;" onclick="togglePGM()">SULJE</button>
+    <div id="pgm-p" class="pgm-content">
+        <h3>PLU PROGRAMMING</h3>
+        <div style="background:#222; padding:15px; border-radius:5px; margin-bottom:20px;">
+            <input type="text" id="p-n" placeholder="Product Name">
+            <input type="number" id="p-p" placeholder="Price in cents">
+            <select id="p-g"></select>
+            <button onclick="addP()" style="padding:5px 15px; cursor:pointer;">ADD PLU</button>
+        </div>
+        <table id="t-p"></table>
+    </div>
+    <div id="pgm-g" class="pgm-content" style="display:none">
+        <h3>DEPARTMENT NAMES</h3>
+        <table id="t-g"></table>
+    </div>
+    <div id="pgm-m" class="pgm-content" style="display:none">
+        <h3>CLERK ID CONFIG</h3>
+        <table id="t-m"></table>
+    </div>
 </div>
 
 <script>
     let db = {
         prods: [],
         groups: [
-            {id:1, name:"OLUET"}, {id:2, name:"SIIDERIT"}, {id:3, name:"DRINKIT"}, {id:4, name:"VIINAT 4CL"},
-            {id:5, name:"MIXERIT"}, {id:6, name:"VIINIT"}, {id:7, name:"MUUT"}, {id:8, name:"TOIMINTO/ALE"}
+            {id:1,name:"BEERS"},{id:2,name:"CIDERS"},{id:3,name:"COCKTAILS"},
+            {id:4,name:"SPIRITS 4CL"},{id:5,name:"SOFT DRINKS"},{id:6,name:"WINES"},
+            {id:7,name:"FOOD"},{id:8,name:"DISCOUNTS/ALE"}
         ],
-        giftcards: {}, clerks: [{id:"1", name:"ADMIN"}], sysPass: "94610758"
+        clerks: [{id:"1", name:"ADMIN"},{id:"2", name:"MANAGER"},{id:"123", name:"STAFF 1"}],
+        giftcards: {}, sysPass: "94610758"
     };
 
-    const initData = () => {
-        const beers = ["KARHU","SANDELS","HEINEKEN","GUINNESS","CORONA","BLANC","LAPIN KULTA","AURA","IPA","APA"];
-        beers.forEach(b => {
-            db.prods.push({name: b+" 0.5L", price: 750, gid: 1});
-            db.prods.push({name: b+" 0.4L", price: 650, gid: 1});
-        });
-        const ciders = ["HAPPY JOE","SOMMERSBY","STRONG BOW","CROWMOOR","MAGNERS"];
-        ciders.forEach(c => db.prods.push({name: c, price: 820, gid: 2}));
-        const cocktails = ["APEROL SPRITZ", "MOJITO", "MARGARITA", "NEGRONI", "G&T", "VODKA REDBULL", "MOSCOW MULE", "WHISKY SOUR", "TOM COLLINS", "PINA COLADA"];
-        cocktails.forEach(c => db.prods.push({name: c, price: 1250, gid: 3}));
-        const spirits = ["VODKA", "GIN", "JAMESON", "JACK DANIELS", "JÄGER", "MINTTU", "FISU", "SALMARI", "BACARDI", "HENNESSY"];
-        spirits.forEach(s => db.prods.push({name: s + " 4CL", price: 700, gid: 4}));
-        const mixers = ["COLA", "SPRITE", "FANTA", "TUOREMEHU", "SODAVESI", "TONIC", "GINGER ALE", "REDBULL", "MAITO", "BOOSTER"];
-        mixers.forEach(m => db.prods.push({name: m, price: 150, gid: 5}));
-        db.prods.push({name: "KOMBO: OLUT+SHOT", price: -200, gid: 8, combo: ["0.5L", "4CL"]});
-    };
+    let cart = []; let buffer = ""; let xQty = 1; let currentClerk = null; let activeG = 1; let isReturn = false;
 
-    let cart = []; let buffer = ""; let currentClerk = null; let activeG = 1; let isReturn = false; let xQty = 1;
+    const setup = () => {
+        // Karhu, Sandels, Heineken, Aura, Blanc
+        ["KARHU","SANDELS","AURA","IPA","BLANC"].forEach(n => db.prods.push({name:n+" 0.5L", price:750, gid:1}));
+        ["HAPPY JOE","CROWMOOR","SOMMERSBY"].forEach(n => db.prods.push({name:n, price:850, gid:2}));
+        ["GIN TONIC","MOJITO","APEROL"].forEach(n => db.prods.push({name:n, price:1200, gid:3}));
+        ["FISU","JÄGER","MINTTU","SALMARI"].forEach(n => db.prods.push({name:n+" 4CL", price:700, gid:4}));
+        ["COLA","PEPSI","VESI"].forEach(n => db.prods.push({name:n, price:400, gid:5}));
+        db.prods.push({name:"ALE -1.00", price:100, gid:8}, {name:"ALE -2.00", price:200, gid:8}, {name:"FREE/OFFER", price:0, gid:8});
+    };
 
     document.getElementById('lock-input').onkeypress = (e) => {
-        if(e.key === 'Enter') {
-            if(e.target.value === db.sysPass) {
-                document.getElementById('system-lock').style.display = 'none';
-                document.getElementById('pos-container').style.display = 'grid';
-                initData(); renderUI();
-            } else { alert("PÄÄSY ESTETTY"); e.target.value = ""; }
+        if(e.key==='Enter' && e.target.value===db.sysPass) {
+            document.getElementById('system-lock').style.display='none';
+            document.getElementById('pos-container').style.display='grid';
+            setup(); renderUI();
         }
     };
 
     function num(v) { buffer += v; updateDisplay(); }
-    function clearBuffer() { buffer = ""; updateDisplay(); }
-    function multiplier() { 
-        if(buffer === "") { xQty = 1; } 
-        else { xQty = parseInt(buffer); }
-        setMsg("MÄÄRÄ", xQty + " X");
-        buffer = "";
-    }
+    function clearBuffer() { buffer = ""; xQty = 1; updateDisplay(); }
+    function multiplier() { xQty = buffer==="" ? 1 : parseInt(buffer); buffer = ""; updateDisplay(); }
+    
     function updateDisplay() { 
-        document.getElementById('buf-val').innerText = buffer==="" ? (xQty > 1 ? xQty + " X" : "0.00") : (parseInt(buffer)/100).toFixed(2); 
+        let val = buffer==="" ? (xQty>1 ? xQty+" X" : "0.00") : (parseInt(buffer)/100).toFixed(2);
+        document.getElementById('buf-val').innerText = val; 
     }
 
     function clerkLogin() {
-        const c = db.clerks.find(x => x.id === buffer);
-        if(c) { currentClerk = c; document.getElementById('st-clerk').innerText = "MYYJÄ: " + c.name; clearBuffer(); setMsg("VALMIS", "0.00"); }
+        let c = db.clerks.find(x => x.id === buffer);
+        if(c) { currentClerk = c; document.getElementById('st-clerk').innerText = "CLERK: "+c.name; clearBuffer(); }
+        else { alert("INVALID CLERK ID"); clearBuffer(); }
     }
 
     function addProd(p) {
-        if(!currentClerk) return alert("KIRJAUDU SISÄÄN!");
+        if(!currentClerk) return alert("PLEASE LOGIN FIRST!");
         
-        let price = p.price/100;
-        if(isReturn) price = -Math.abs(price);
+        // Hinta: joko syötetty hinta tai PLU-oletushinta
+        let price = buffer !== "" ? parseInt(buffer)/100 : p.price/100;
+        
+        // Automaattinen miinus ALE-ryhmälle (8) tai jos refund-tila on päällä
+        if(p.gid === 8 || isReturn) {
+            price = -Math.abs(price);
+        }
 
-        // Rivien yhdistämislogiikka
+        // Rivien yhdistäminen (jos nimi ja hinta täsmää)
         let existing = cart.find(i => i.name === p.name && i.price === price);
         if(existing) {
             existing.qty += xQty;
         } else {
             cart.push({name: p.name, price: price, qty: xQty});
         }
-
-        setMsg(p.name, (price * xQty).toFixed(2));
-        xQty = 1; // nollaa kerroin
-        updateReceiptLines();
+        
+        buffer = ""; xQty = 1; updateReceipt(); updateDisplay();
     }
 
-    function updateReceiptLines() {
+    function updateReceipt() {
+        let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
         let txt = cart.map(i => {
-            let line = i.qty > 1 ? `${i.qty} x ${i.name}` : i.name;
-            return `${line.padEnd(22).substring(0,22)} ${(i.price * i.qty).toFixed(2).padStart(8)}`;
+            let label = (i.qty > 1 ? i.qty+' x ' : '') + i.name;
+            return `${label.padEnd(20).substring(0,20)} ${(i.price*i.qty).toFixed(2).padStart(8)}`;
         }).join('\n');
-        document.getElementById('receipt-area').innerText = txt;
+        document.getElementById('receipt-area').innerText = txt || "READY";
+        if(cart.length > 0) {
+            document.getElementById('receipt-area').scrollTop = 99999;
+        }
     }
 
     function showSubtotal() {
-        let total = cart.reduce((a, b) => a + (b.price * b.qty), 0);
-        setMsg("VÄLISUMMA", total.toFixed(2));
+        let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
+        document.getElementById('buf-val').innerText = "TOTAL: " + total.toFixed(2);
     }
 
     function payCash() {
-        if(cart.length === 0) return;
-        let total = cart.reduce((a, b) => a + (b.price * b.qty), 0);
-        let cash = buffer === "" ? total : parseInt(buffer)/100;
-        if(cash < total) return alert("SUMMA PUUTTUU");
-        
-        setMsg("VAIHTORAHA", (cash - total).toFixed(2));
-        printFinalReceipt("KÄTEINEN", cash, (cash-total));
-        cart = []; clearBuffer(); xQty = 1;
+        if(cart.length===0) return;
+        let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
+        let cash = buffer==="" ? total : parseInt(buffer)/100;
+        if(cash < total) return alert("INSUFFICIENT CASH");
+        finalizeTransaction("CASH", cash, cash-total);
     }
 
     function processCard() {
-        if(cart.length === 0) return;
-        let total = cart.reduce((a, b) => a + (b.price * b.qty), 0);
+        if(cart.length===0) return;
+        let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
         document.getElementById('term-sum').innerText = total.toFixed(2) + " €";
-        document.getElementById('term-sim').style.display = 'flex';
+        document.getElementById('term-sim').style.display='flex';
         
         setTimeout(() => {
-            document.getElementById('term-sim').style.display = 'none';
-            printFinalReceipt("KORTTI", total, 0);
-            cart = []; clearBuffer(); xQty = 1;
-        }, 2500);
-    }
-
-    function printFinalReceipt(mode, pay, change) {
-        let total = cart.reduce((a, b) => a + (b.price * b.qty), 0);
-        let txt = "     *** KUITTI ***\n\n";
-        txt += cart.map(i => {
-            let line = i.qty > 1 ? `${i.qty} x ${i.name}` : i.name;
-            return `${line.padEnd(20).substring(0,20)} ${(i.price * i.qty).toFixed(2).padStart(10)}`;
-        }).join('\n');
-        txt += `\n${"-".repeat(31)}`;
-        txt += `\nYHTEENSÄ: ${total.toFixed(2).padStart(18)} EUR`;
-        txt += `\n${mode}: ${pay.toFixed(2).padStart(19)} EUR`;
-        txt += `\nVAIHTO: ${change.toFixed(2).padStart(20)} EUR`;
-        txt += `\n\nKIITOS KÄYNNISTÄ!`;
-        document.getElementById('receipt-area').innerText = txt;
+            document.getElementById('term-status').innerText = "PROCESSING...";
+            setTimeout(() => {
+                document.getElementById('term-sim').style.display='none';
+                document.getElementById('term-status').innerText = "INSERT CARD";
+                finalizeTransaction("CARD", total, 0);
+            }, 1500);
+        }, 1000);
     }
 
     function sellGiftCard() {
-        let val = buffer === "" ? 50 : parseInt(buffer)/100;
-        let code = "L" + Math.floor(1000+Math.random()*8999);
+        let val = buffer==="" ? 50 : parseInt(buffer)/100;
+        let code = "L" + Math.floor(10000+Math.random()*89999);
         db.giftcards[code] = val;
-        cart.push({name: "LAHJA "+code, price: val, qty: 1});
-        setMsg("LAHJA MYYTY", val.toFixed(2));
-        updateReceiptLines(); clearBuffer();
+        cart.push({name: "GIFT CARD "+code, price: val, qty: 1});
+        updateReceipt(); clearBuffer();
+        alert("GIFT CARD GENERATED: " + code);
     }
 
     function payGiftCard() {
-        let code = prompt("SYÖTÄ KOODI:");
+        let code = prompt("ENTER GIFT CARD CODE:");
         if(db.giftcards[code]) {
             let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
             if(db.giftcards[code] >= total) {
                 db.giftcards[code] -= total;
-                alert("MAKSETTU. SALDO: " + db.giftcards[code].toFixed(2) + "€");
-                printFinalReceipt("LAHJA", total, 0);
-                cart = []; updateReceiptLines();
-            } else { alert("SALDO EI RIITÄ"); }
+                finalizeTransaction("L-PAY", total, 0);
+            } else { alert("INSUFFICIENT BALANCE: " + db.giftcards[code].toFixed(2) + "€"); }
+        } else { alert("INVALID CODE"); }
+    }
+
+    function finalizeTransaction(method, pay, change) {
+        let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
+        let txt = "     *** RECEIPT ***\n\n";
+        txt += cart.map(i => `${((i.qty>1?i.qty+'x ':'')+i.name).padEnd(20).substring(0,20)} ${(i.price*i.qty).toFixed(2).padStart(8)}`).join('\n');
+        txt += `\n${"-".repeat(29)}`;
+        txt += `\nTOTAL: ${total.toFixed(2).padStart(18)} EUR`;
+        txt += `\n${method.padEnd(8)}: ${pay.toFixed(2).padStart(16)} EUR`;
+        txt += `\nCHANGE: ${change.toFixed(2).padStart(18)} EUR`;
+        txt += `\n\nCLERK: ${currentClerk.name}\n${new Date().toLocaleString('fi-FI')}\n\nTHANK YOU!`;
+        
+        document.getElementById('receipt-area').innerText = txt;
+        cart = []; clearBuffer(); isReturn = false;
+        document.getElementById('btn-ret').style.background = "";
+    }
+
+    function toggleReturn() { 
+        isReturn = !isReturn; 
+        document.getElementById('btn-ret').style.background = isReturn ? "var(--btn-yellow)" : ""; 
+        document.getElementById('btn-ret').style.color = isReturn ? "#000" : "#fff";
+    }
+
+    function resetPOS() { cart=[]; clearBuffer(); isReturn=false; updateReceipt(); document.getElementById('btn-ret').style.background=""; }
+    function voidLast() { cart.pop(); updateReceipt(); }
+
+    function renderUI() {
+        // Tuotteet
+        document.getElementById('product-grid').innerHTML = db.prods.filter(p => p.gid == activeG).map(p => `
+            <div class="btn c-prod ${p.gid==8?'c-promo-btn':''}" onclick='addProd(${JSON.stringify(p)})'>
+                <span style="font-weight:bold">${p.name}</span>
+                <b style="margin-top:auto; font-size:16px;">${(p.price/100).toFixed(2)}€</b>
+            </div>`).join('');
+        
+        // Ryhmät
+        document.getElementById('group-grid').innerHTML = db.groups.map(g => `
+            <div class="btn c-group ${g.id == activeG ? 'active-group' : ''}" onclick="activeG=${g.id};renderUI()">${g.name}</div>`).join('');
+    }
+
+    // PGM HALLINTA
+    function togglePGM() {
+        let o = document.getElementById('pgm-overlay');
+        o.style.display = (o.style.display==='flex'?'none':'flex');
+        if(o.style.display==='flex') renderPGM();
+    }
+
+    function showTab(t) {
+        document.querySelectorAll('.pgm-content').forEach(c => c.style.display='none');
+        document.getElementById('pgm-'+t).style.display='block';
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        renderPGM();
+    }
+
+    function renderPGM() {
+        document.getElementById('t-p').innerHTML = `<tr><th>PLU NAME</th><th>PRICE</th><th>GRP</th><th>OP</th></tr>` + 
+            db.prods.map((p,i) => `<tr><td>${p.name}</td><td>${p.price/100}€</td><td>${p.gid}</td><td><button onclick="db.prods.splice(${i},1);renderPGM();renderUI()">DEL</button></td></tr>`).join('');
+        
+        document.getElementById('t-g').innerHTML = `<tr><th>ID</th><th>DEPT NAME</th></tr>` + 
+            db.groups.map(g => `<tr><td>${g.id}</td><td>${g.name}</td></tr>`).join('');
+        
+        document.getElementById('t-m').innerHTML = `<tr><th>ID</th><th>NAME</th></tr>` + 
+            db.clerks.map(c => `<tr><td>${c.id}</td><td>${c.name}</td></tr>`).join('');
+
+        document.getElementById('p-g').innerHTML = db.groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+    }
+
+    function addP() {
+        let n = document.getElementById('p-n').value;
+        let p = parseInt(document.getElementById('p-p').value);
+        let g = parseInt(document.getElementById('p-g').value);
+        if(n && !isNaN(p)) { 
+            db.prods.push({name:n.toUpperCase(), price:p, gid:g}); 
+            renderPGM(); renderUI();
+            document.getElementById('p-n').value = ""; document.getElementById('p-p').value = "";
         }
     }
 
-    function setMsg(m, v) { document.getElementById('buf-msg').innerText = m; document.getElementById('buf-val').innerText = v; }
-    function resetPOS() { cart = []; clearBuffer(); xQty = 1; document.getElementById('receipt-area').innerText = "VALMIS"; setMsg("VALMIS", "0.00"); isReturn = false; }
-    function voidLast() { cart.pop(); updateReceiptLines(); showSubtotal(); }
-    function voidFull() { cart = []; updateReceiptLines(); setMsg("VOID", "0.00"); }
-    function toggleReturn() { isReturn = !isReturn; document.getElementById('btn-ret').style.background = isReturn?"yellow":""; }
-
-    function renderUI() {
-        document.getElementById('product-grid').innerHTML = db.prods.filter(p => p.gid == activeG).map(p => `
-            <div class="btn ${activeG==8?'c-promo':(activeG==5?'c-mixer':(activeG==4?'c-spirit':'c-prod'))}" onclick='addProd(${JSON.stringify(p)})'>${p.name}<br>${(p.price/100).toFixed(2)}€</div>
-        `).join('');
-        document.getElementById('group-grid').innerHTML = db.groups.map(g => `
-            <div class="btn c-group ${g.id == activeG ? 'active-group' : ''}" onclick="activeG=${g.id};renderUI()">${g.name}</div>
-        `).join('');
-        document.getElementById('p-group').innerHTML = db.groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
-    }
-
-    function togglePGM() { document.getElementById('pgm-overlay').style.display = (document.getElementById('pgm-overlay').style.display==="block" ? "none" : "block"); renderPGMList(); }
-    function renderPGMList() { document.getElementById('pgm-list').innerHTML = db.prods.map((p,i) => `<div style="font-size:12px; border-bottom:1px solid #333; padding:5px;">${p.name} - ${p.price/100}€ <button onclick="db.prods.splice(${i},1);renderPGMList();renderUI();">X</button></div>`).join(''); }
-    function saveProduct() {
-        let n = document.getElementById('p-name').value;
-        let p = parseInt(document.getElementById('p-price').value);
-        let g = parseInt(document.getElementById('p-group').value);
-        if(n && p) { db.prods.push({name:n, price:p, gid:g}); renderPGMList(); renderUI(); }
-    }
-
-    setInterval(() => document.getElementById('st-time').innerText = new Date().toLocaleTimeString('fi-FI'), 1000);
+    setInterval(() => {
+        document.getElementById('st-time').innerText = new Date().toLocaleTimeString('fi-FI');
+    }, 1000);
 </script>
 </body>
 </html>
