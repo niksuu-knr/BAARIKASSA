@@ -2,24 +2,18 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Web-QT6000 Pro - Security Update</title>
+    <title>Web-QT6000 Pro - THE ULTIMATE MASTER</title>
     <style>
         :root {
-            --pos-blue: #33367c;
-            --screen-gray: #b0b8c0;
-            --btn-num: #4a4d4e;
-            --btn-red: #8c3b3b;
-            --btn-blue: #3a5a8c;
-            --btn-green: #3b8c4a;
-            --btn-yellow: #a69e3a;
-            --prod-brown: #8c583b;
-            --btn-purple: #6a3b8c;
-            --btn-orange: #d35400;
+            --pos-blue: #33367c; --screen-gray: #b0b8c0; --btn-num: #4a4d4e;
+            --btn-red: #8c3b3b; --btn-blue: #3a5a8c; --btn-green: #3b8c4a;
+            --btn-yellow: #a69e3a; --prod-brown: #8c583b; --btn-purple: #6a3b8c;
+            --btn-orange: #d35400; --btn-mixer: #2e4a3e; --btn-spirit: #5d4037;
         }
 
         body { margin: 0; background: #000; font-family: 'Arial Narrow', sans-serif; color: white; height: 100vh; overflow: hidden; }
 
-        /* LUKITUSRUUTU */
+        /* LUKITUS JA TERMINAALI */
         #system-lock, #terminal-sim {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -38,7 +32,7 @@
 
         #main-layout { display: grid; grid-template-columns: 450px 1fr; gap: 10px; overflow: hidden; }
         #left-col { display: flex; flex-direction: column; gap: 5px; height: 100%; }
-        #receipt-area { background: var(--screen-gray); height: 42%; border: 3px solid #555; color: #111; font-family: monospace; padding: 12px; overflow-y: auto; white-space: pre; font-size: 15px; line-height: 1.2; }
+        #receipt-area { background: var(--screen-gray); height: 42%; border: 3px solid #555; color: #111; font-family: monospace; padding: 12px; overflow-y: auto; white-space: pre; font-size: 14px; line-height: 1.2; }
         
         #input-line { background: #000; height: 70px; border: 3px solid #555; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
         #buf-val { color: #0f0; font-size: 38px; font-weight: bold; }
@@ -46,10 +40,11 @@
         #keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; flex-grow: 1; }
 
         #product-area { display: grid; grid-template-rows: 1fr 160px; gap: 10px; height: 100%; }
-        #product-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 70px; gap: 8px; overflow-y: auto; }
+        #product-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 60px; gap: 6px; overflow-y: auto; }
         #group-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 8px; border-top: 3px solid #444; padding-top: 10px; }
 
-        .btn { border-radius: 4px; border: 1px solid #333; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; font-size: 11px; text-transform: uppercase; padding: 5px; }
+        /* PAINIKKEET */
+        .btn { border-radius: 4px; border: 1px solid #333; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; font-size: 10px; text-transform: uppercase; padding: 5px; }
         .btn:active { filter: brightness(1.4); }
         
         .c-num { background: var(--btn-num); font-size: 18px; }
@@ -58,27 +53,30 @@
         .c-green { background: var(--btn-green); }
         .c-yellow { background: var(--btn-yellow); color: #000; }
         .c-prod { background: var(--prod-brown); }
-        .c-group { background: #555; border: 2px solid #777; }
+        .c-group { background: #555; border: 2px solid #777; font-size: 9px; }
         .c-gift { background: var(--btn-purple); }
         .c-disc { background: var(--btn-orange); }
+        .c-mix { background: var(--btn-mixer); border-color: #4CAF50; }
+        .c-spirit { background: var(--btn-spirit); border-color: #d35400; }
         .active-group { border-color: #0f0; background: #666; }
         
         .span-2-v { grid-row: span 2; }
 
-        /* MODAALIT */
+        /* OVERLAYT */
         #discount-overlay, #pgm-overlay { display: none; position: absolute; z-index: 2000; padding: 20px; border: 2px solid #fff; box-shadow: 0 0 40px #000; }
         #discount-overlay { left: 460px; top: 50px; width: 320px; background: #2c3e50; border-color: var(--btn-orange); }
         #pgm-overlay { inset: 15px; background: #1a1a1a; overflow-y: auto; border-color: var(--btn-blue); }
+        
         .pgm-card { background: #333; padding: 15px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #555; }
         table { width: 100%; background: #eee; color: #000; margin-top: 10px; border-collapse: collapse; }
         th, td { border: 1px solid #999; padding: 8px; text-align: left; font-size: 13px; }
-        .disc-option { background: var(--btn-orange); padding: 15px; margin-bottom: 8px; border-radius: 4px; cursor: pointer; text-align: center; font-weight: bold; font-size: 14px; }
+        .disc-option { background: var(--btn-orange); padding: 15px; margin-bottom: 8px; border-radius: 4px; cursor: pointer; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div id="system-lock">
-    <h1 style="letter-spacing: 2px;">WEB-QT6000 PRO SYSTEM</h1>
+    <h1 style="letter-spacing: 2px;">WEB-QT6000 PRO MASTER</h1>
     <p>SYÖTÄ JÄRJESTELMÄKOODI</p>
     <input type="password" id="lock-input" placeholder="********" onkeypress="checkUnlock(event)">
 </div>
@@ -92,7 +90,7 @@
 </div>
 
 <div id="discount-overlay">
-    <h3 style="margin-top:0; text-align:center; color: #fff;">VALITSE ALENNUSPERUSTE</h3>
+    <h3 style="margin-top:0; text-align:center;">VALITSE ALENNUS</h3>
     <div id="discount-options-list"></div>
     <button class="btn c-red" style="width:100%; height: 45px; margin-top:10px;" onclick="closeDiscountMenu()">PERUUTA</button>
 </div>
@@ -100,8 +98,8 @@
 <div id="pos-container">
     <div id="status-bar">
         <span id="st-mode">REGISTER MODE</span>
-        <span style="text-align: center;" id="st-receipt">Kuitti: 000000</span>
-        <span style="text-align: right;" id="st-time">00.00.00</span>
+        <span style="text-align: center;" id="st-receipt">Kuitti: 000100</span>
+        <span style="text-align: right;" id="st-time">00:00:00</span>
     </div>
 
     <div id="main-layout">
@@ -153,24 +151,15 @@
 <div id="pgm-overlay">
     <div style="display:flex; justify-content:space-between; align-items:center;">
         <h1 style="color:var(--btn-blue)">PGM MANAGER</h1>
-        <button class="btn c-red" style="width:120px; height:50px" onclick="togglePGM()">SULJE TILA</button>
+        <button class="btn c-red" style="width:120px; height:50px" onclick="togglePGM()">SULJE</button>
     </div>
     
     <div class="pgm-card">
-        <h3>HENKILÖSTÖ</h3>
+        <h3>MYYJIEN HALLINTA</h3>
         <input type="text" id="pgm-clerk-name" placeholder="Nimi">
         <input type="text" id="pgm-clerk-id" placeholder="ID">
         <button onclick="addClerk()">LISÄÄ MYYJÄ</button>
         <table id="list-clerks"></table>
-    </div>
-
-    <div class="pgm-card">
-        <h3>TUOTTEIDEN HALLINTA</h3>
-        <input type="text" id="pgm-p-name" placeholder="Tuotteen nimi">
-        <input type="number" id="pgm-p-price" placeholder="Hinta sentteinä">
-        <select id="pgm-p-group"></select>
-        <button onclick="addProduct()">TALLENNA TUOTE</button>
-        <table id="list-prods"></table>
     </div>
 
     <div class="pgm-card">
@@ -185,77 +174,88 @@
 <script>
     let db = {
         prods: [
-            {name:"KARHU 0.5L", price:750, gid:1}, {name:"SANDELS 0.5L", price:750, gid:1}, 
-            {name:"HEINEKEN", price:850, gid:1}, {name:"AURA", price:700, gid:1},
-            {name:"LONKERO ORIGINAL", price:850, gid:2}, {name:"ANANAS LONKERO", price:850, gid:2},
-            {name:"HAPPY JOE OMENA", price:820, gid:3}, {name:"SOMMERSBY", price:800, gid:3},
-            {name:"FISU SHOTTI", price:600, gid:4}, {name:"SALMARI", price:600, gid:4},
-            {name:"GIN TONIC", price:1100, gid:5}, {name:"ROMMIKOLA", price:950, gid:5},
-            {name:"COLA 0.4L", price:450, gid:6}, {name:"REDBULL", price:550, gid:6},
-            {name:"SIPSIPUSSI", price:450, gid:7}, {name:"PÄHKINÄT", price:350, gid:7}
+            // 1: OLUET (Kuvat + Lisät)
+            {name:"KARHU 0.5L", price:700, gid:1}, {name:"SANDELS 0.5L", price:700, gid:1}, {name:"HEINEKEN", price:750, gid:1}, 
+            {name:"IPA BEER", price:850, gid:1}, {name:"GUINNESS", price:950, gid:1}, {name:"CORONA", price:800, gid:1},
+            {name:"BLANC 1664", price:850, gid:1}, {name:"AURA OLUT", price:650, gid:1},
+            // 2: LONKEROT
+            {name:"LONKERO ORIG", price:850, gid:2}, {name:"ANANAS LONK", price:850, gid:2}, {name:"KARPALO LONK", price:850, gid:2},
+            {name:"LEMONADE LONK", price:850, gid:2}, {name:"MUSTIKKA LONK", price:850, gid:2},
+            // 3: SIIDERIT
+            {name:"HAPPY JOE", price:820, gid:3}, {name:"SOMMERSBY OM", price:800, gid:3}, {name:"SOMMERSBY PÄ", price:800, gid:3},
+            {name:"GINGER BEER", price:850, gid:3}, {name:"MAGNERS 0.5L", price:950, gid:3},
+            // 4: SHOTIT
+            {name:"FISU", price:550, gid:4}, {name:"JÄGER", price:650, gid:4}, {name:"MINTTU", price:600, gid:4}, {name:"FIREBALL", price:700, gid:4},
+            {name:"TEQUILA", price:750, gid:4}, {name:"SALMARI", price:600, gid:4}, {name:"FERNET BRANCA", price:750, gid:4}, {name:"JALAVIINA*", price:600, gid:4},
+            {name:"TEQUILA ROSE", price:700, gid:4}, {name:"HOT SHOT", price:850, gid:4},
+            // 5: COCKTAILS
+            {name:"APEROL SPRITZ", price:1130, gid:5}, {name:"BLOODY MARY", price:1050, gid:5}, {name:"MOJITO", price:1250, gid:5},
+            {name:"NEGRONI", price:1300, gid:5}, {name:"G&T CLASSIC", price:1100, gid:5}, {name:"WHITE RUSSIAN", price:1000, gid:5},
+            {name:"SEX ON BEACH", price:1190, gid:5}, {name:"TEQUILA SUNR.", price:970, gid:5}, {name:"COSMOPOLITAN", price:1050, gid:5},
+            // 6: SPIRITS (4CL)
+            {name:"VODKA 4CL", price:700, gid:6}, {name:"GIN 4CL", price:750, gid:6}, {name:"BEEFEATER GIN", price:850, gid:6},
+            {name:"VAALEA ROMMI", price:700, gid:6}, {name:"TUMMA ROMMI", price:750, gid:6}, {name:"WHISKY HOUSE", price:750, gid:6},
+            {name:"JAMESON", price:850, gid:6}, {name:"JACK DANIELS", price:900, gid:6}, {name:"KONJAKKI VS", price:900, gid:6},
+            {name:"BAILEYS 4CL", price:700, gid:6}, {name:"AMARETTO", price:750, gid:6},
+            // 7: WINE/SOFT
+            {name:"TALON PUNA 16CL", price:800, gid:7}, {name:"TALON VALKO 16CL", price:800, gid:7}, {name:"PROSECCO 12CL", price:850, gid:7},
+            {name:"ALKO-TON OLUT", price:550, gid:7}, {name:"COLA/SPRITE", price:450, gid:7}, {name:"RED BULL TLK", price:550, gid:7},
+            {name:"VESIPULLO", price:300, gid:7},
+            // 8: MIXERS/ADD
+            {name:"TUPLA (+4CL)", price:500, gid:8}, {name:"COLA PIDENNYS", price:150, gid:8}, {name:"SOODA PIDENNYS", price:100, gid:8},
+            {name:"TONIC WATER", price:200, gid:8}, {name:"PREMIUM TONIC", price:350, gid:8}, {name:"MEHU LISÄYS", price:150, gid:8},
+            {name:"RED BULL LISÄ", price:350, gid:8}, {name:"LIME/HEDELMÄ", price:50, gid:8}, {name:"MINTTU/EXTRA", price:100, gid:8},
+            {name:"VALKUAINEN", price:100, gid:8}, {name:"SIIRAPPI", price:100, gid:8}
         ],
         groups: [
             {id:1, name:"OLUET"}, {id:2, name:"LONKEROT"}, {id:3, name:"SIIDERIT"},
-            {id:4, name:"SHOTIT"}, {id:5, name:"DRINKIT"}, {id:6, name:"MIXERIT"},
-            {id:7, name:"SNACKS"}
+            {id:4, name:"SHOTIT"}, {id:5, name:"COCKTAILS"}, {id:6, name:"SPIRITS"},
+            {id:7, name:"WINE/SOFT"}, {id:8, name:"MIXERS/ADD"}
         ],
-        clerks: [{id:"1", name:"PÄÄKÄYTTÄJÄ"}],
+        clerks: [{id:"1", name:"ADMIN"}],
         discounts: [
-            {name:"ALE 10%", val:10, type:"%"}, 
-            {name:"HENKILÖKUNTA -50%", val:50, type:"%"},
-            {name:"ALE 2€", val:2, type:"€"}
+            {name:"ALE 10%", val:10, type:"%"}, {name:"STAFF -50%", val:50, type:"%"}, {name:"ALE 2€", val:2, type:"€"}
         ],
         giftcards: [],
-        receiptNo: 100, 
-        sysPass: "94610758" // UUSI PÄÄSYKOODI TÄSSÄ
+        receiptNo: 100,
+        sysPass: "94610758"
     };
 
     let cart = []; let buffer = ""; let currentClerk = null; let isReturn = false; let activeG = 1;
 
     function init() {
-        const saved = localStorage.getItem('qt6000_secure_data');
+        const saved = localStorage.getItem('qt6000_master_data');
         if(saved) db = JSON.parse(saved);
         renderUI();
         setInterval(() => document.getElementById('st-time').innerText = new Date().toLocaleTimeString('fi-FI'), 1000);
     }
 
-    function save() { localStorage.setItem('qt6000_secure_data', JSON.stringify(db)); }
+    function save() { localStorage.setItem('qt6000_master_data', JSON.stringify(db)); }
 
     function checkUnlock(e) {
         if(e.key === "Enter") {
             if(document.getElementById('lock-input').value === db.sysPass) {
                 document.getElementById('system-lock').style.display = "none";
                 document.getElementById('pos-container').style.display = "grid";
-            } else {
-                alert("VIRHEELLINEN PÄÄSYKOODI");
-                document.getElementById('lock-input').value = "";
-            }
+            } else { alert("VIRHE"); document.getElementById('lock-input').value = ""; }
         }
     }
 
     function clerkLogin() {
         const c = db.clerks.find(x => x.id === buffer);
-        if(c) { 
-            currentClerk = c; 
-            document.getElementById('receipt-area').innerText = `KIRJATTU SISÄÄN: ${c.name}\nVALMIS MYYNTIIN`; 
-            clearBuffer(); 
-        } else { 
-            alert("MYYJÄTUNNUSTA EI TUNNISTETTU"); 
-        }
+        if(c) { currentClerk = c; document.getElementById('receipt-area').innerText = `MYYJÄ: ${c.name}\nVALMIS`; clearBuffer(); }
     }
 
     function num(v) { buffer += v; updateDisplay(); }
     function clearBuffer() { buffer = ""; updateDisplay(); }
-    function updateDisplay() {
-        document.getElementById('buf-val').innerText = buffer === "" ? "0.00" : (parseInt(buffer)/100).toFixed(2);
-    }
+    function updateDisplay() { document.getElementById('buf-val').innerText = buffer === "" ? "0.00" : (parseInt(buffer)/100).toFixed(2); }
 
     function addProd(p) {
-        if(!currentClerk) { alert("KIRJAUDU SISÄÄN MYYJÄNÄ!"); return; }
-        let price = (buffer !== "") ? parseInt(buffer)/100 : p.price/100;
+        if(!currentClerk) { alert("KIRJAUDU SISÄÄN!"); return; }
+        let price = p.price/100;
         if(isReturn) price = -Math.abs(price);
         cart.push({name: p.name, price: price, disc: 0});
-        renderCart(); clearBuffer();
+        renderCart();
     }
 
     function renderCart() {
@@ -265,16 +265,14 @@
             total += line;
             return `${i.name.padEnd(20).substring(0,20)} ${line.toFixed(2).padStart(10)}`;
         }).join('\n');
-        txt += `\n\n${"YHTEENSÄ".padEnd(20)} ${total.toFixed(2).padStart(10)}`;
+        txt += `\n\n${"YHTEENSÄ".padEnd(20)} ${total.toFixed(2).padStart(10)} EUR`;
         document.getElementById('receipt-area').innerText = txt;
     }
 
     function payCash() {
         if(cart.length === 0) return;
         let total = cart.reduce((a,b) => a+(b.price-b.disc), 0);
-        let cash = buffer !== "" ? parseInt(buffer)/100 : total;
-        if(cash < total) { alert("MAKSETTU SUMMA EI RIITÄ"); return; }
-        finishSale(total, 'KÄTEINEN', cash, cash - total);
+        finishSale(total, 'KÄTEINEN', total, 0);
     }
 
     function processCardPayment() {
@@ -285,99 +283,71 @@
         setTimeout(() => {
             document.getElementById('terminal-sim').style.display = "none";
             finishSale(total, 'KORTTI', total, 0);
-        }, 2500);
+        }, 2000);
     }
 
     function finishSale(total, method, paid, change) {
         cart.forEach(item => {
             if(item.isGiftCard) db.giftcards.push({ date: new Date().toLocaleDateString('fi-FI'), code: item.code, amount: item.price });
         });
-
-        let paper = `*** KUITTI ${db.receiptNo} ***\nMYYJÄ: ${currentClerk.name}\n----------------------------\n`;
-        paper += cart.map(i => `${i.name.padEnd(18).substring(0,18)} ${(i.price-i.disc).toFixed(2).padStart(10)}`).join('\n');
-        paper += `\n----------------------------\n`;
-        paper += `LOPO SUMMA: ${total.toFixed(2).padStart(12)} EUR\n`;
-        paper += `MAKSUTAPA:  ${method.padStart(12)}\n`;
-        paper += `MAKSETTU:   ${paid.toFixed(2).padStart(12)} EUR\n`;
-        paper += `TAKAISIN:   ${change.toFixed(2).padStart(12)} EUR\n`;
-        paper += `\nKIITOS KÄYNNISTÄ!`;
-        
-        document.getElementById('receipt-area').innerText = paper;
         db.receiptNo++; cart = []; isReturn = false; clearBuffer(); save(); renderUI();
-        document.getElementById('btn-ret').style.background = "";
-    }
-
-    function payWithGiftCard() {
-        if(cart.length === 0) return;
-        let code = prompt("SYÖTÄ LAHJAKORTIN KOODI:");
-        if(code) {
-            let total = cart.reduce((a,b) => a+(b.price-b.disc), 0);
-            finishSale(total, `LAHJA [${code.toUpperCase()}]`, total, 0);
-        }
+        document.getElementById('receipt-area').innerText = "KIITOS KÄYNNISTÄ\nMAKSETTU: " + method;
     }
 
     function sellGiftCard() {
-        if(!currentClerk) return;
         let amount = buffer !== "" ? parseInt(buffer)/100 : 50;
         let code = 'L-' + Math.random().toString(36).substr(2, 5).toUpperCase();
-        cart.push({ name: "MYYTY LAHJAKORTTI", price: parseFloat(amount), disc: 0, isGiftCard: true, code: code });
+        cart.push({ name: "LAHJAKORTTI", price: amount, disc: 0, isGiftCard: true, code: code });
         renderCart(); clearBuffer();
+    }
+
+    function payWithGiftCard() {
+        let code = prompt("SYÖTÄ LAHJAKORTIN KOODI:");
+        if(code) { alert("LAHJA HYVÄKSYTTY"); payCash(); }
     }
 
     function openDiscountMenu() {
         if(cart.length === 0) return;
         const list = document.getElementById('discount-options-list');
-        list.innerHTML = db.discounts.map((d, i) => `<div class="disc-option" onclick="applyNamedDiscount(${i})">${d.name}</div>`).join('');
+        list.innerHTML = db.discounts.map((d, i) => `<div class="disc-option" onclick="applyDisc(${i})">${d.name}</div>`).join('');
         document.getElementById('discount-overlay').style.display = "block";
     }
 
     function closeDiscountMenu() { document.getElementById('discount-overlay').style.display = "none"; }
 
-    function applyNamedDiscount(idx) {
+    function applyDisc(idx) {
         const d = db.discounts[idx]; 
         let last = cart[cart.length - 1];
         last.disc = (d.type === '%') ? (last.price * (d.val / 100)) : d.val;
-        last.name += ` (-${d.val}${d.type})`;
         renderCart(); closeDiscountMenu();
     }
 
     function renderUI() {
-        document.getElementById('product-grid').innerHTML = db.prods.filter(p => p.gid === activeG).map(p => `
-            <div class="btn c-prod" onclick='addProd(${JSON.stringify(p)})'>${p.name}<br>${(p.price/100).toFixed(2)}</div>
-        `).join('');
+        document.getElementById('product-grid').innerHTML = db.prods.filter(p => p.gid === activeG).map(p => {
+            let c = 'c-prod';
+            if(activeG===8) c='c-mix'; if(activeG===6) c='c-spirit';
+            return `<div class="btn ${c}" onclick='addProd(${JSON.stringify(p)})'>${p.name}<br>${(p.price/100).toFixed(2)}€</div>`;
+        }).join('');
         document.getElementById('group-grid').innerHTML = db.groups.map(g => `
             <div class="btn c-group ${g.id===activeG?'active-group':''}" onclick="activeG=${g.id};renderUI()">${g.name}</div>
         `).join('');
-        renderPGMLists();
+        renderPGM();
     }
 
-    function renderPGMLists() {
-        document.getElementById('list-clerks').innerHTML = db.clerks.map((c,i) => `<tr><td>${c.name}</td><td>${c.id}</td><td><button onclick="del('c',${i})">X</button></td></tr>`).join('');
-        document.getElementById('list-prods').innerHTML = db.prods.map((p,i) => `<tr><td>${p.name}</td><td>${(p.price/100).toFixed(2)}</td><td><button onclick="del('p',${i})">X</button></td></tr>`).join('');
-        document.getElementById('giftcard-rows').innerHTML = db.giftcards.slice().reverse().map(gc => `<tr><td>${gc.date}</td><td>${gc.code}</td><td>${gc.amount.toFixed(2)}</td></tr>`).join('');
-        document.getElementById('pgm-p-group').innerHTML = db.groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+    function renderPGM() {
+        document.getElementById('list-clerks').innerHTML = db.clerks.map((c,i) => `<tr><td>${c.name}</td><td>${c.id}</td></tr>`).join('');
+        document.getElementById('giftcard-rows').innerHTML = db.giftcards.map(gc => `<tr><td>${gc.date}</td><td>${gc.code}</td><td>${gc.amount.toFixed(2)}</td></tr>`).join('');
     }
 
     function addClerk() { 
         let n = document.getElementById('pgm-clerk-name'); let id = document.getElementById('pgm-clerk-id');
-        if(n.value && id.value) { db.clerks.push({name:n.value, id:id.value}); n.value=""; id.value=""; save(); renderPGMLists(); }
+        if(n.value && id.value) { db.clerks.push({name:n.value, id:id.value}); save(); renderPGM(); }
     }
 
-    function addProduct() {
-        let n = document.getElementById('pgm-p-name'); let p = document.getElementById('pgm-p-price'); let g = document.getElementById('pgm-p-group');
-        if(n.value && p.value){ db.prods.push({name:n.value.toUpperCase(), price:parseInt(p.value), gid:parseInt(g.value)}); n.value=""; p.value=""; save(); renderUI(); }
-    }
-
-    function del(type, i) {
-        if(type==='c') db.clerks.splice(i,1);
-        if(type==='p') db.prods.splice(i,1);
-        save(); renderUI();
-    }
-
-    function togglePGM() { let o = document.getElementById('pgm-overlay'); o.style.display = (o.style.display==="block") ? "none" : "block"; renderPGMLists(); }
-    function resetPOS() { cart = []; clearBuffer(); document.getElementById('receipt-area').innerText = "VALMIS"; isReturn = false; document.getElementById('btn-ret').style.background = ""; }
+    function togglePGM() { let o = document.getElementById('pgm-overlay'); o.style.display = (o.style.display==="block") ? "none" : "block"; }
+    function resetPOS() { cart = []; clearBuffer(); document.getElementById('receipt-area').innerText = "VALMIS"; isReturn = false; }
     function voidLast() { cart.pop(); renderCart(); }
-    function voidFull() { if(confirm("TYHJENNETÄÄNKÖ KOKO KUITTI?")) resetPOS(); }
+    function voidFull() { if(confirm("TYHJENNÄ?")) resetPOS(); }
     function toggleReturn() { isReturn = !isReturn; document.getElementById('btn-ret').style.background = isReturn?"yellow":""; }
     function subtotal() { renderCart(); }
 
