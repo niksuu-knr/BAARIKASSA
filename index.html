@@ -2,7 +2,7 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Web-QT6000 Pro - Gift Card Logic</title>
+    <title>Web-QT6000 Pro - Security Update</title>
     <style>
         :root {
             --pos-blue: #33367c;
@@ -19,20 +19,26 @@
 
         body { margin: 0; background: #000; font-family: 'Arial Narrow', sans-serif; color: white; height: 100vh; overflow: hidden; }
 
-        /* LUKITUS JA TERMINAALI */
+        /* LUKITUSRUUTU */
         #system-lock, #terminal-sim {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         #terminal-sim { display: none; z-index: 10000; }
         .terminal-box { background: #fff; color: #000; padding: 40px; border-radius: 10px; text-align: center; font-weight: bold; box-shadow: 0 0 20px #0f0; }
 
+        #lock-input { 
+            background: #222; border: 2px solid #555; color: #0f0; font-size: 32px; 
+            text-align: center; padding: 10px; border-radius: 5px; margin-top: 20px; width: 300px;
+        }
+
+        /* PÄÄNÄKYMÄ */
         #pos-container { display: none; grid-template-rows: 35px 1fr; height: 100vh; padding: 5px; gap: 5px; box-sizing: border-box; }
         #status-bar { background: var(--pos-blue); display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; padding: 0 15px; font-size: 14px; border: 1px solid #444; }
 
         #main-layout { display: grid; grid-template-columns: 450px 1fr; gap: 10px; overflow: hidden; }
         #left-col { display: flex; flex-direction: column; gap: 5px; height: 100%; }
-        #receipt-area { background: var(--screen-gray); height: 40%; border: 3px solid #555; color: #111; font-family: monospace; padding: 10px; overflow-y: auto; white-space: pre; font-size: 15px; }
+        #receipt-area { background: var(--screen-gray); height: 42%; border: 3px solid #555; color: #111; font-family: monospace; padding: 12px; overflow-y: auto; white-space: pre; font-size: 15px; line-height: 1.2; }
         
         #input-line { background: #000; height: 70px; border: 3px solid #555; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
         #buf-val { color: #0f0; font-size: 38px; font-weight: bold; }
@@ -40,13 +46,13 @@
         #keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; flex-grow: 1; }
 
         #product-area { display: grid; grid-template-rows: 1fr 160px; gap: 10px; height: 100%; }
-        #product-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 80px; gap: 8px; overflow-y: auto; }
+        #product-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 70px; gap: 8px; overflow-y: auto; }
         #group-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 8px; border-top: 3px solid #444; padding-top: 10px; }
 
-        .btn { border-radius: 4px; border: 1px solid #333; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; font-size: 12px; text-transform: uppercase; padding: 5px; }
-        .btn:active { filter: brightness(1.3); }
+        .btn { border-radius: 4px; border: 1px solid #333; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; font-size: 11px; text-transform: uppercase; padding: 5px; }
+        .btn:active { filter: brightness(1.4); }
         
-        .c-num { background: var(--btn-num); }
+        .c-num { background: var(--btn-num); font-size: 18px; }
         .c-red { background: var(--btn-red); }
         .c-blue { background: var(--btn-blue); }
         .c-green { background: var(--btn-green); }
@@ -60,40 +66,40 @@
         .span-2-v { grid-row: span 2; }
 
         /* MODAALIT */
-        #discount-overlay, #pgm-overlay { display: none; position: absolute; z-index: 2000; padding: 20px; border: 2px solid #fff; box-shadow: 0 0 30px #000; }
-        #discount-overlay { left: 460px; top: 50px; width: 300px; background: #2c3e50; border-color: var(--btn-orange); }
-        #pgm-overlay { inset: 10px; background: #222; overflow-y: auto; }
-
-        .pgm-card { background: #333; padding: 15px; margin-bottom: 10px; border-radius: 8px; }
+        #discount-overlay, #pgm-overlay { display: none; position: absolute; z-index: 2000; padding: 20px; border: 2px solid #fff; box-shadow: 0 0 40px #000; }
+        #discount-overlay { left: 460px; top: 50px; width: 320px; background: #2c3e50; border-color: var(--btn-orange); }
+        #pgm-overlay { inset: 15px; background: #1a1a1a; overflow-y: auto; border-color: var(--btn-blue); }
+        .pgm-card { background: #333; padding: 15px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #555; }
         table { width: 100%; background: #eee; color: #000; margin-top: 10px; border-collapse: collapse; }
-        th, td { border: 1px solid #999; padding: 6px; text-align: left; }
-        .disc-option { background: var(--btn-orange); padding: 15px; margin-bottom: 8px; border-radius: 4px; cursor: pointer; text-align: center; font-weight: bold; }
+        th, td { border: 1px solid #999; padding: 8px; text-align: left; font-size: 13px; }
+        .disc-option { background: var(--btn-orange); padding: 15px; margin-bottom: 8px; border-radius: 4px; cursor: pointer; text-align: center; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div id="system-lock">
-    <h2>SYÖTÄ KASSAN PÄÄSYKOODI</h2>
-    <input type="password" id="lock-input" placeholder="****" onkeypress="checkUnlock(event)">
+    <h1 style="letter-spacing: 2px;">WEB-QT6000 PRO SYSTEM</h1>
+    <p>SYÖTÄ JÄRJESTELMÄKOODI</p>
+    <input type="password" id="lock-input" placeholder="********" onkeypress="checkUnlock(event)">
 </div>
 
 <div id="terminal-sim">
     <div class="terminal-box">
         <div id="term-status">ODOTTAA KORTTIA...</div>
-        <div id="term-amount" style="font-size: 24px; margin: 10px 0;">0.00€</div>
-        <div style="font-size: 11px; color: #666;">WEB-TERMINAL PRO 2026</div>
+        <div id="term-amount" style="font-size: 28px; margin: 15px 0;">0.00€</div>
+        <div style="font-size: 11px; color: #999;">VERIFONE SECURE CONNECT 2026</div>
     </div>
 </div>
 
 <div id="discount-overlay">
-    <h3 style="margin-top:0; text-align:center;">VALITSE ALENNUS</h3>
+    <h3 style="margin-top:0; text-align:center; color: #fff;">VALITSE ALENNUSPERUSTE</h3>
     <div id="discount-options-list"></div>
-    <button class="btn c-red" style="width:100%; margin-top:10px;" onclick="closeDiscountMenu()">PERUUTA</button>
+    <button class="btn c-red" style="width:100%; height: 45px; margin-top:10px;" onclick="closeDiscountMenu()">PERUUTA</button>
 </div>
 
 <div id="pos-container">
     <div id="status-bar">
-        <span id="st-mode">REG MANAGER</span>
+        <span id="st-mode">REGISTER MODE</span>
         <span style="text-align: center;" id="st-receipt">Kuitti: 000000</span>
         <span style="text-align: right;" id="st-time">00.00.00</span>
     </div>
@@ -110,30 +116,30 @@
                 <div class="btn c-num" onclick="clearBuffer()">C</div>
                 <div class="btn c-red" onclick="voidLast()">POISTA</div>
                 <div class="btn c-red" onclick="voidFull()">MITÄTÖI</div>
-                <div class="btn c-gift" onclick="sellGiftCard()">MYY LAHJA-<br>KORTTI</div>
+                <div class="btn c-gift" onclick="sellGiftCard()">MYY LAHJA</div>
                 
                 <div class="btn c-num" onclick="num('7')">7</div>
                 <div class="btn c-num" onclick="num('8')">8</div>
                 <div class="btn c-num" onclick="num('9')">9</div>
-                <div class="btn c-disc" onclick="openDiscountMenu()">ALENNUKSET</div>
+                <div class="btn c-disc" onclick="openDiscountMenu()">ALE %</div>
                 <div class="btn c-yellow" onclick="clerkLogin()">MYYJÄ</div>
                 
                 <div class="btn c-num" onclick="num('4')">4</div>
                 <div class="btn c-num" onclick="num('5')">5</div>
                 <div class="btn c-num" onclick="num('6')">6</div>
-                <div class="btn c-blue" onclick="togglePGM()">PGM TILA</div>
-                <div class="btn c-gift" onclick="payWithGiftCard()">L-KORTTI<br>MAKSU</div>
+                <div class="btn c-blue" onclick="togglePGM()">PGM</div>
+                <div class="btn c-gift" onclick="payWithGiftCard()">L-MAKSU</div>
                 
                 <div class="btn c-num" onclick="num('1')">1</div>
-                <div class="btn c-num" onclick="num('2') : num('2')">2</div>
+                <div class="btn c-num" onclick="num('2')">2</div>
                 <div class="btn c-num" onclick="num('3')">3</div>
-                <div class="btn c-green span-2-v" onclick="subtotal()">VÄLI<br>SUMMA</div>
+                <div class="btn c-green span-2-v" onclick="subtotal()">VÄLI SUMMA</div>
                 <div class="btn c-blue" onclick="processCardPayment()">KORTTI</div>
                 
                 <div class="btn c-num" onclick="num('0')">0</div>
                 <div class="btn c-num" onclick="num('00')">00</div>
                 <div class="btn c-red" id="btn-ret" onclick="toggleReturn()">PALAUTUS</div>
-                <div class="btn c-black" style="background:#000" onclick="pay('KÄTEINEN')">KÄTEINEN</div>
+                <div class="btn c-black" style="background:#000" onclick="payCash()">KÄTEINEN</div>
             </div>
         </div>
 
@@ -144,45 +150,33 @@
     </div>
 </div>
 
-<!-- PGM-HALLINTA -->
 <div id="pgm-overlay">
-    <div style="display:flex; justify-content:space-between">
-        <h1>PGM HALLINTA</h1>
-        <button class="btn c-red" style="width:100px; height:40px" onclick="togglePGM()">SULJE</button>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h1 style="color:var(--btn-blue)">PGM MANAGER</h1>
+        <button class="btn c-red" style="width:120px; height:50px" onclick="togglePGM()">SULJE TILA</button>
     </div>
-
+    
     <div class="pgm-card">
-        <h3>MYYJIEN HALLINTA</h3>
+        <h3>HENKILÖSTÖ</h3>
         <input type="text" id="pgm-clerk-name" placeholder="Nimi">
-        <input type="text" id="pgm-clerk-id" placeholder="ID-Koodi">
-        <button onclick="addClerk()">LISÄÄ</button>
+        <input type="text" id="pgm-clerk-id" placeholder="ID">
+        <button onclick="addClerk()">LISÄÄ MYYJÄ</button>
         <table id="list-clerks"></table>
     </div>
 
     <div class="pgm-card">
-        <h3>ALENNUKSET</h3>
-        <input type="text" id="pgm-d-name" placeholder="Nimi">
-        <input type="number" id="pgm-d-val" placeholder="Arvo">
-        <select id="pgm-d-type"><option value="%">%</option><option value="€">€</option></select>
-        <button onclick="addDiscount()">LISÄÄ</button>
-        <table id="list-discounts"></table>
-    </div>
-
-    <div class="pgm-card">
-        <h3>TUOTTEET & RYHMÄT</h3>
-        <input type="text" id="pgm-g-name" placeholder="Uusi ryhmä"> <button onclick="addGroup()">LISÄÄ RYHMÄ</button>
-        <br><br>
-        <input type="text" id="pgm-p-name" placeholder="Nimi">
-        <input type="number" id="pgm-p-price" placeholder="Hinta snt">
+        <h3>TUOTTEIDEN HALLINTA</h3>
+        <input type="text" id="pgm-p-name" placeholder="Tuotteen nimi">
+        <input type="number" id="pgm-p-price" placeholder="Hinta sentteinä">
         <select id="pgm-p-group"></select>
-        <button onclick="addProduct()">LISÄÄ TUOTE</button>
+        <button onclick="addProduct()">TALLENNA TUOTE</button>
         <table id="list-prods"></table>
     </div>
 
     <div class="pgm-card">
-        <h3>AKTIIVISET LAHJAKORTIT</h3>
+        <h3>REKISTERÖIDYT LAHJAKORTIT</h3>
         <table id="list-giftcards">
-            <thead><tr><th>Pvm</th><th>Koodi</th><th>Arvo (€)</th></tr></thead>
+            <thead><tr><th>Pvm</th><th>Koodi</th><th>Saldo (€)</th></tr></thead>
             <tbody id="giftcard-rows"></tbody>
         </table>
     </div>
@@ -190,55 +184,77 @@
 
 <script>
     let db = {
-        prods: [{name:"KAHVI", price:250, gid:1}],
-        groups: [{id:1, name:"YLEINEN"}],
-        clerks: [{id:"1", name:"KALLE"}],
-        discounts: [{name:"ALE 10%", val:10, type:"%"}],
+        prods: [
+            {name:"KARHU 0.5L", price:750, gid:1}, {name:"SANDELS 0.5L", price:750, gid:1}, 
+            {name:"HEINEKEN", price:850, gid:1}, {name:"AURA", price:700, gid:1},
+            {name:"LONKERO ORIGINAL", price:850, gid:2}, {name:"ANANAS LONKERO", price:850, gid:2},
+            {name:"HAPPY JOE OMENA", price:820, gid:3}, {name:"SOMMERSBY", price:800, gid:3},
+            {name:"FISU SHOTTI", price:600, gid:4}, {name:"SALMARI", price:600, gid:4},
+            {name:"GIN TONIC", price:1100, gid:5}, {name:"ROMMIKOLA", price:950, gid:5},
+            {name:"COLA 0.4L", price:450, gid:6}, {name:"REDBULL", price:550, gid:6},
+            {name:"SIPSIPUSSI", price:450, gid:7}, {name:"PÄHKINÄT", price:350, gid:7}
+        ],
+        groups: [
+            {id:1, name:"OLUET"}, {id:2, name:"LONKEROT"}, {id:3, name:"SIIDERIT"},
+            {id:4, name:"SHOTIT"}, {id:5, name:"DRINKIT"}, {id:6, name:"MIXERIT"},
+            {id:7, name:"SNACKS"}
+        ],
+        clerks: [{id:"1", name:"PÄÄKÄYTTÄJÄ"}],
+        discounts: [
+            {name:"ALE 10%", val:10, type:"%"}, 
+            {name:"HENKILÖKUNTA -50%", val:50, type:"%"},
+            {name:"ALE 2€", val:2, type:"€"}
+        ],
         giftcards: [],
-        receiptNo: 1,
-        sysPass: "1234"
+        receiptNo: 100, 
+        sysPass: "94610758" // UUSI PÄÄSYKOODI TÄSSÄ
     };
 
     let cart = []; let buffer = ""; let currentClerk = null; let isReturn = false; let activeG = 1;
 
     function init() {
-        const saved = localStorage.getItem('qt6000_v12');
+        const saved = localStorage.getItem('qt6000_secure_data');
         if(saved) db = JSON.parse(saved);
         renderUI();
         setInterval(() => document.getElementById('st-time').innerText = new Date().toLocaleTimeString('fi-FI'), 1000);
     }
 
-    function save() { localStorage.setItem('qt6000_v12', JSON.stringify(db)); }
+    function save() { localStorage.setItem('qt6000_secure_data', JSON.stringify(db)); }
 
-    /* LUKITUS JA SISÄÄNKIRJAUS */
     function checkUnlock(e) {
         if(e.key === "Enter") {
             if(document.getElementById('lock-input').value === db.sysPass) {
                 document.getElementById('system-lock').style.display = "none";
                 document.getElementById('pos-container').style.display = "grid";
+            } else {
+                alert("VIRHEELLINEN PÄÄSYKOODI");
+                document.getElementById('lock-input').value = "";
             }
         }
     }
 
     function clerkLogin() {
         const c = db.clerks.find(x => x.id === buffer);
-        if(c) { currentClerk = c; document.getElementById('receipt-area').innerText = `MYYJÄ: ${c.name}\nVALMIS`; clearBuffer(); }
-        else { alert("MYYJÄÄ EI LÖYDY"); }
+        if(c) { 
+            currentClerk = c; 
+            document.getElementById('receipt-area').innerText = `KIRJATTU SISÄÄN: ${c.name}\nVALMIS MYYNTIIN`; 
+            clearBuffer(); 
+        } else { 
+            alert("MYYJÄTUNNUSTA EI TUNNISTETTU"); 
+        }
     }
 
-    /* KASSALOGIIKKA */
     function num(v) { buffer += v; updateDisplay(); }
     function clearBuffer() { buffer = ""; updateDisplay(); }
     function updateDisplay() {
-        document.getElementById('buf-val').innerText = buffer === "" ? "0.00" : buffer;
-        document.getElementById('buf-msg').innerText = isReturn ? "PALAUTUS" : "SYÖTTÖ";
+        document.getElementById('buf-val').innerText = buffer === "" ? "0.00" : (parseInt(buffer)/100).toFixed(2);
     }
 
     function addProd(p) {
-        if(!currentClerk) return;
-        let finalPrice = (buffer !== "" && !isNaN(buffer)) ? parseInt(buffer) : p.price;
-        if(isReturn) finalPrice = -Math.abs(finalPrice);
-        cart.push({name: p.name, price: finalPrice/100, disc: 0});
+        if(!currentClerk) { alert("KIRJAUDU SISÄÄN MYYJÄNÄ!"); return; }
+        let price = (buffer !== "") ? parseInt(buffer)/100 : p.price/100;
+        if(isReturn) price = -Math.abs(price);
+        cart.push({name: p.name, price: price, disc: 0});
         renderCart(); clearBuffer();
     }
 
@@ -247,66 +263,84 @@
         let txt = cart.map(i => {
             let line = i.price - i.disc;
             total += line;
-            return `${i.name.padEnd(22)} ${line.toFixed(2).padStart(8)}`;
+            return `${i.name.padEnd(20).substring(0,20)} ${line.toFixed(2).padStart(10)}`;
         }).join('\n');
+        txt += `\n\n${"YHTEENSÄ".padEnd(20)} ${total.toFixed(2).padStart(10)}`;
         document.getElementById('receipt-area').innerText = txt;
     }
 
-    /* LAHJAKORTTIMAKSU - UUSI LOGIIKKA */
-    function payWithGiftCard() {
+    function payCash() {
         if(cart.length === 0) return;
-        
-        // Jos puskurissa ei ole koodia, pyydetään se
-        if(buffer === "") {
-            let manualCode = prompt("SYÖTÄ LAHJAKORTIN KOODI:");
-            if(manualCode) {
-                buffer = manualCode.toUpperCase();
-                completeGiftCardPayment();
-            } else {
-                alert("MAKSU PERUUTETTU: KOODI PUUTTUU");
-            }
-        } else {
-            // Jos koodi oli jo näytöllä (bufferissa)
-            completeGiftCardPayment();
-        }
+        let total = cart.reduce((a,b) => a+(b.price-b.disc), 0);
+        let cash = buffer !== "" ? parseInt(buffer)/100 : total;
+        if(cash < total) { alert("MAKSETTU SUMMA EI RIITÄ"); return; }
+        finishSale(total, 'KÄTEINEN', cash, cash - total);
     }
 
-    function completeGiftCardPayment() {
-        const code = buffer;
-        // Tässä voisi olla tarkistus db.giftcards-listasta, jos halutaan validointi
-        pay(`LAHJA-KORTTI [${code}]`);
-    }
-
-    /* MUUT MAKSUT */
     function processCardPayment() {
         if(cart.length === 0) return;
         let total = cart.reduce((a,b) => a+(b.price-b.disc), 0);
         document.getElementById('term-amount').innerText = total.toFixed(2) + "€";
         document.getElementById('terminal-sim').style.display = "flex";
-        setTimeout(() => { document.getElementById('term-status').innerText = "KÄSITELLÄÄN..."; }, 1500);
-        setTimeout(() => { 
-            document.getElementById('term-status').innerText = "HYVÄKSYTTY!";
-            setTimeout(() => {
-                document.getElementById('terminal-sim').style.display = "none";
-                document.getElementById('term-status').innerText = "ODOTTAA KORTTIA...";
-                pay('KORTTI');
-            }, 1000);
-        }, 3000);
+        setTimeout(() => {
+            document.getElementById('terminal-sim').style.display = "none";
+            finishSale(total, 'KORTTI', total, 0);
+        }, 2500);
     }
 
-    function pay(m) {
-        let total = cart.reduce((a,b) => a+(b.price-b.disc), 0);
+    function finishSale(total, method, paid, change) {
         cart.forEach(item => {
             if(item.isGiftCard) db.giftcards.push({ date: new Date().toLocaleDateString('fi-FI'), code: item.code, amount: item.price });
         });
-        let paper = `*** KUITTI ${db.receiptNo} ***\nMYYJÄ: ${currentClerk.name}\n--------------------\n`;
-        paper += cart.map(i => `${i.name.substring(0,15).padEnd(15)} ${(i.price-i.disc).toFixed(2).padStart(10)}`).join('\n');
-        paper += `\n--------------------\nYHTEENSÄ: ${total.toFixed(2)} EUR\nMAKSUTAPA: ${m}\nKIITOS!`;
+
+        let paper = `*** KUITTI ${db.receiptNo} ***\nMYYJÄ: ${currentClerk.name}\n----------------------------\n`;
+        paper += cart.map(i => `${i.name.padEnd(18).substring(0,18)} ${(i.price-i.disc).toFixed(2).padStart(10)}`).join('\n');
+        paper += `\n----------------------------\n`;
+        paper += `LOPO SUMMA: ${total.toFixed(2).padStart(12)} EUR\n`;
+        paper += `MAKSUTAPA:  ${method.padStart(12)}\n`;
+        paper += `MAKSETTU:   ${paid.toFixed(2).padStart(12)} EUR\n`;
+        paper += `TAKAISIN:   ${change.toFixed(2).padStart(12)} EUR\n`;
+        paper += `\nKIITOS KÄYNNISTÄ!`;
+        
         document.getElementById('receipt-area').innerText = paper;
-        db.receiptNo++; cart = []; isReturn = false; save(); clearBuffer(); renderUI();
+        db.receiptNo++; cart = []; isReturn = false; clearBuffer(); save(); renderUI();
+        document.getElementById('btn-ret').style.background = "";
     }
 
-    /* PGM & HALLINTA */
+    function payWithGiftCard() {
+        if(cart.length === 0) return;
+        let code = prompt("SYÖTÄ LAHJAKORTIN KOODI:");
+        if(code) {
+            let total = cart.reduce((a,b) => a+(b.price-b.disc), 0);
+            finishSale(total, `LAHJA [${code.toUpperCase()}]`, total, 0);
+        }
+    }
+
+    function sellGiftCard() {
+        if(!currentClerk) return;
+        let amount = buffer !== "" ? parseInt(buffer)/100 : 50;
+        let code = 'L-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+        cart.push({ name: "MYYTY LAHJAKORTTI", price: parseFloat(amount), disc: 0, isGiftCard: true, code: code });
+        renderCart(); clearBuffer();
+    }
+
+    function openDiscountMenu() {
+        if(cart.length === 0) return;
+        const list = document.getElementById('discount-options-list');
+        list.innerHTML = db.discounts.map((d, i) => `<div class="disc-option" onclick="applyNamedDiscount(${i})">${d.name}</div>`).join('');
+        document.getElementById('discount-overlay').style.display = "block";
+    }
+
+    function closeDiscountMenu() { document.getElementById('discount-overlay').style.display = "none"; }
+
+    function applyNamedDiscount(idx) {
+        const d = db.discounts[idx]; 
+        let last = cart[cart.length - 1];
+        last.disc = (d.type === '%') ? (last.price * (d.val / 100)) : d.val;
+        last.name += ` (-${d.val}${d.type})`;
+        renderCart(); closeDiscountMenu();
+    }
+
     function renderUI() {
         document.getElementById('product-grid').innerHTML = db.prods.filter(p => p.gid === activeG).map(p => `
             <div class="btn c-prod" onclick='addProd(${JSON.stringify(p)})'>${p.name}<br>${(p.price/100).toFixed(2)}</div>
@@ -319,8 +353,7 @@
 
     function renderPGMLists() {
         document.getElementById('list-clerks').innerHTML = db.clerks.map((c,i) => `<tr><td>${c.name}</td><td>${c.id}</td><td><button onclick="del('c',${i})">X</button></td></tr>`).join('');
-        document.getElementById('list-discounts').innerHTML = db.discounts.map((d,i) => `<tr><td>${d.name}</td><td>${d.val}${d.type}</td><td><button onclick="del('d',${i})">X</button></td></tr>`).join('');
-        document.getElementById('list-prods').innerHTML = db.prods.map((p,i) => `<tr><td>${p.name}</td><td>${p.price/100}</td><td><button onclick="del('p',${i})">X</button></td></tr>`).join('');
+        document.getElementById('list-prods').innerHTML = db.prods.map((p,i) => `<tr><td>${p.name}</td><td>${(p.price/100).toFixed(2)}</td><td><button onclick="del('p',${i})">X</button></td></tr>`).join('');
         document.getElementById('giftcard-rows').innerHTML = db.giftcards.slice().reverse().map(gc => `<tr><td>${gc.date}</td><td>${gc.code}</td><td>${gc.amount.toFixed(2)}</td></tr>`).join('');
         document.getElementById('pgm-p-group').innerHTML = db.groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
     }
@@ -329,45 +362,24 @@
         let n = document.getElementById('pgm-clerk-name'); let id = document.getElementById('pgm-clerk-id');
         if(n.value && id.value) { db.clerks.push({name:n.value, id:id.value}); n.value=""; id.value=""; save(); renderPGMLists(); }
     }
-    function addDiscount() {
-        let n = document.getElementById('pgm-d-name'); let v = document.getElementById('pgm-d-val'); let t = document.getElementById('pgm-d-type');
-        if(n.value && v.value) { db.discounts.push({name:n.value, val:parseFloat(v.value), type:t.value}); n.value=""; v.value=""; save(); renderPGMLists(); }
-    }
-    function addGroup() { let n = document.getElementById('pgm-g-name'); if(n.value){ db.groups.push({id:Date.now(), name:n.value}); n.value=""; save(); renderUI(); } }
+
     function addProduct() {
         let n = document.getElementById('pgm-p-name'); let p = document.getElementById('pgm-p-price'); let g = document.getElementById('pgm-p-group');
-        if(n.value && p.value){ db.prods.push({name:n.value, price:parseInt(p.value), gid:parseInt(g.value)}); n.value=""; p.value=""; save(); renderUI(); }
-    }
-    function del(type, i) { 
-        if(type==='c') db.clerks.splice(i,1); if(type==='d') db.discounts.splice(i,1); if(type==='p') db.prods.splice(i,1);
-        save(); renderUI(); 
+        if(n.value && p.value){ db.prods.push({name:n.value.toUpperCase(), price:parseInt(p.value), gid:parseInt(g.value)}); n.value=""; p.value=""; save(); renderUI(); }
     }
 
-    /* APUTOIMINNOT */
-    function sellGiftCard() {
-        let amount = buffer !== "" ? parseInt(buffer)/100 : prompt("Summa:", "50.00");
-        let code = 'LG-' + Math.random().toString(36).substr(2, 5).toUpperCase();
-        cart.push({ name: "LAHJAKORTTI (" + code + ")", price: parseFloat(amount), disc: 0, isGiftCard: true, code: code });
-        renderCart(); clearBuffer();
+    function del(type, i) {
+        if(type==='c') db.clerks.splice(i,1);
+        if(type==='p') db.prods.splice(i,1);
+        save(); renderUI();
     }
-    function openDiscountMenu() {
-        if(cart.length === 0) return;
-        const list = document.getElementById('discount-options-list');
-        list.innerHTML = db.discounts.map((d, i) => `<div class="disc-option" onclick="applyNamedDiscount(${i})">${d.name}</div>`).join('');
-        document.getElementById('discount-overlay').style.display = "block";
-    }
-    function closeDiscountMenu() { document.getElementById('discount-overlay').style.display = "none"; }
-    function applyNamedDiscount(idx) {
-        const d = db.discounts[idx]; let last = cart[cart.length - 1];
-        last.disc = (d.type === '%') ? (last.price * (d.val / 100)) : d.val;
-        last.name += ` [${d.name}]`; renderCart(); closeDiscountMenu();
-    }
+
     function togglePGM() { let o = document.getElementById('pgm-overlay'); o.style.display = (o.style.display==="block") ? "none" : "block"; renderPGMLists(); }
-    function resetPOS() { cart = []; clearBuffer(); document.getElementById('receipt-area').innerText = "VALMIS"; }
+    function resetPOS() { cart = []; clearBuffer(); document.getElementById('receipt-area').innerText = "VALMIS"; isReturn = false; document.getElementById('btn-ret').style.background = ""; }
     function voidLast() { cart.pop(); renderCart(); }
-    function voidFull() { cart = []; renderCart(); }
+    function voidFull() { if(confirm("TYHJENNETÄÄNKÖ KOKO KUITTI?")) resetPOS(); }
     function toggleReturn() { isReturn = !isReturn; document.getElementById('btn-ret').style.background = isReturn?"yellow":""; }
-    function subtotal() { renderCart(); const total = cart.reduce((a,b)=>a+(b.price-b.disc),0); document.getElementById('buf-val').innerText = total.toFixed(2); }
+    function subtotal() { renderCart(); }
 
     init();
 </script>
