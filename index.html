@@ -2,7 +2,7 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Web-QT6000 Pro - V24 ULTIMATE BAR</title>
+    <title>QT-6000 V25 MAX-DATA</title>
     <style>
         :root {
             --pos-blue: #1c2331; --screen-gray: #b0b8c0; --btn-num: #37474f;
@@ -49,20 +49,20 @@
 <body>
 
 <div id="system-lock">
-    <h1>QT-6000 V24 ULTIMATE</h1>
+    <h1>QT-6000 V25 MAX-DATA</h1>
     <input type="password" id="lock-input" placeholder="ACCESS CODE" autocomplete="off">
 </div>
 
 <div id="term-sim">
     <div style="background: #333; padding: 40px; border-radius: 20px; text-align: center; color: #0f0; font-family: monospace;">
-        <h2 id="term-sum">0.00 €</h2><p>OTA MAKSU KORTILLA</p>
+        <h2 id="term-sum">0.00 €</h2><p>LUE KORTTI...</p>
     </div>
 </div>
 
 <div id="pos-container">
     <div id="status-bar">
         <span id="st-clerk">EI KIRJ.</span>
-        <span style="text-align:center">QT-6000 ENTERPRISE V24</span>
+        <span style="text-align:center">MAX-INVENTORY & SMART STACK</span>
         <span id="st-time">00:00:00</span>
     </div>
 
@@ -107,10 +107,10 @@
 <div id="pgm-overlay">
     <div style="background:#263238; display:flex; padding:10px;">
         <button class="btn c-blue" style="padding:10px 20px" onclick="togglePGM()">SULJE PGM</button>
-        <h2 style="margin:0 0 0 20px">MYYJIEN HALLINTA</h2>
+        <h2 style="margin:0 0 0 20px">MYYJIEN HALLINTA / PGM</h2>
     </div>
     <div style="padding:20px;">
-        <input type="text" id="m-id" placeholder="ID"> <input type="text" id="m-name" placeholder="NIMI">
+        <input type="text" id="m-id" placeholder="MYYJÄ ID"> <input type="text" id="m-name" placeholder="NIMI">
         <button onclick="addClerk()">LISÄÄ MYYJÄ</button>
         <table id="t-m" style="width:100%; margin-top:20px; text-align:left; border-collapse:collapse;"></table>
     </div>
@@ -119,34 +119,39 @@
 <script>
     let db = {
         prods: [],
-        groups: [{id:1,name:"OLUET"},{id:2,name:"SIIDERIT"},{id:3,name:"VIINAT"},{id:4,name:"SHOTIT"},{id:5,name:"MIXERIT"},{id:6,name:"VIINIT"},{id:7,name:"RUOKA"},{id:8,name:"- ALE -"}]
+        groups: [
+            {id:1,name:"OLUET"},{id:2,name:"SIIDERIT"},{id:3,name:"VIINAT"},
+            {id:4,name:"SHOTIT"},{id:5,name:"MIXERIT"},{id:6,name:"VIINIT"},
+            {id:7,name:"RUOKA"},{id:8,name:"- ALE -"}
+        ]
     };
     let clerks = [{id:"1", name:"ADMIN"},{id:"123", name:"KASSA 1"}];
     let cart = []; let buffer = ""; let xQty = 1; let currentClerk = null; let activeG = 1; let isReturn = false;
 
+    // MASSIVE INVENTORY GENERATOR (100+ Tuotetta)
     const setup = () => {
-        // Oluet (G1)
-        ["KARHU 0.4","KARHU 0.5","SANDELS","AURA","IPA","LAGER","PILS","STOUT","VEHNÄOLUT"].forEach(n => db.prods.push({name:n, price:850, gid:1}));
-        // Siiderit (G2)
-        ["LONKERO","LONKERO RED","LONKERO LIME","HAPPY JOE","CROWMOOR","MAGNERS","PERE MAGLOIRE"].forEach(n => db.prods.push({name:n, price:820, gid:2}));
-        // Viinat (G3)
-        ["VODKA 4CL","GIN 4CL","ROMMI V","ROMMI T","WHISKY HOUSE","BRANDY","HENNESSY","TEQUILA"].forEach(n => db.prods.push({name:n, price:800, gid:3}));
-        // Shotit (G4)
-        ["FISU","SALMARI","MINTTU","JÄGER","HOT SHOT","FIREBALL","SAMBUCA","FERNET","XANTE"].forEach(n => db.prods.push({name:n, price:700, gid:4}));
-        // Mixerit (G5)
-        ["+ COLA","+ SPRITE","+ TONIC","+ RED BULL","+ MEHU","+ SODA","+ GINGER B"].forEach(n => db.prods.push({name:n, price:250, gid:5}));
-        // Viinit (G6)
-        ["PUNAVIINI 12CL","VALKOVIINI 12CL","PROSECCO","SKUMPPA PULLO"].forEach(n => db.prods.push({name:n, price:950, gid:6}));
-        // Ruoka (G7)
-        ["BURGER","RANSKALAISET","NUGGETS","TOAST","PIZZA SLICE"].forEach(n => db.prods.push({name:n, price:1200, gid:7}));
-        // Alennukset (G8)
+        // G1: OLUET (20 kpl)
+        ["KARHU","SANDELS","AURA","IPA","LAGER","PILS","STOUT","APA","NEIPA","VEHNÄ","HOLITON","KOFF","LAPIN KULTA","HEINEKEN","SOL","BUD","GUINNESS","PORTER","KAUSI-OLUT","ERIKOIS-IPA"].forEach(n => db.prods.push({name:n, price:850, gid:1}));
+        // G2: SIIDERI/LONKERO (15 kpl)
+        ["LONKERO ORG","LONKERO RED","LONKERO LIME","HAPPY JOE","CROWMOOR","MAGNERS","STRONG BOW","BULMERS","PERE MAGLOIRE","SOMERSBY","GINGER JOE","DRY APPLE","REVIEL","HENRY WESTONS","BACARDI BREEZER"].forEach(n => db.prods.push({name:n, price:820, gid:2}));
+        // G3: VIINAT (20 kpl)
+        ["VODKA","GIN","ROMMI V","ROMMI T","WHISKY HOUSE","BRANDY","HENNESSY","TEQUILA","BACARDI","SMIRNOFF","BEEFEATER","JAMESON","JACK DANIELS","BOMBAY","CAPTAIN MORGAN","JOHNNIE WALKER","MALIBU","PASSOA","BAILEYS","KOSKENKORVA"].forEach(n => db.prods.push({name:n, price:800, gid:3}));
+        // G4: SHOTIT (20 kpl)
+        ["FISU","SALMARI","MINTTU","JÄGER","HOT SHOT","FIREBALL","SAMBUCA","FERNET","XANTE","GAMMEL DANSK","ABSINTTI","TEQUILA ROSE","TURKINPIPPURI","VALHALLA","SAUNA-LONKERO","MINTTU CHOKO","DOPPELKORN","JALoviina","OUZO","GRAPPA"].forEach(n => db.prods.push({name:n, price:700, gid:4}));
+        // G5: MIXERIT (15 kpl)
+        ["+ COLA","+ SPRITE","+ TONIC","+ RED BULL","+ SODA","+ MEHU","+ GINGER B","+ MAITO","+ KAHVI","+ RUSCHIAN","+ LEMONADE","+ CRANBERRY","+ BITTER LEMON","PELKKÄ COLA","PELKKÄ REDBULL"].forEach(n => db.prods.push({name:n, price:250, gid:5}));
+        // G6: VIINIT (10 kpl)
+        ["VALKOVIINI","PUNAVIINI","ROSEE","PROSECCO LASI","PROSECCO PULLO","SKUMPPA","SAMAPPANJA","CAVA","KUIVA VALKO","MAKEA VALKO"].forEach(n => db.prods.push({name:n, price:950, gid:6}));
+        // G7: RUOKA (10 kpl)
+        ["BURGER","RANSKALAISET","NUGGETS","TOAST","PIZZA SLICE","NACHOS","MOZZARELLA STICKS","SALAATTI","VEGE BURGER","DIPPI"].forEach(n => db.prods.push({name:n, price:1200, gid:7}));
+        // G8: ALE (7 kpl)
         db.prods.push(
             {name:"STAFF -50%", price:-0.5, gid:8, type:"auto_perc"},
             {name:"VIP -20%", price:-0.2, gid:8, type:"auto_perc"},
-            {name:"HH -30%", price:-0.3, gid:8, type:"auto_perc"},
             {name:"VAPAA ALE %", price:0, gid:8, type:"manual_perc"},
             {name:"VAPAA ALE €", price:0, gid:8, type:"manual_fix"},
             {name:"ALE -1.00€", price:-100, gid:8, type:"fix"},
+            {name:"ALE -2.00€", price:-200, gid:8, type:"fix"},
             {name:"HUKKA", price:0, gid:8, type:"fix"}
         );
     };
@@ -161,7 +166,7 @@
 
     function num(v) { buffer += v; updateDisplay(); }
     function clearBuffer() { buffer = ""; xQty = 1; updateDisplay(); }
-    function multiplier() { xQty = buffer==="" ? 1 : parseInt(buffer); buffer = ""; updateDisplay(); }
+    function multiplier() { xQty = (buffer === "" || buffer === "0") ? 1 : parseInt(buffer); buffer = ""; updateDisplay(); }
     function updateDisplay() { 
         let val = buffer==="" ? (xQty>1 ? xQty+" X" : "0.00") : (parseInt(buffer)/100).toFixed(2);
         document.getElementById('buf-val').innerText = val; 
@@ -182,9 +187,9 @@
         if(p.gid === 8) {
             if(p.type === "auto_perc") finalPrice = totalNow * p.price;
             else if(p.type === "manual_perc") {
-                let perc = buffer === "" ? 0 : parseInt(buffer) / 100;
-                finalPrice = -(totalNow * perc);
-                finalName = `ALE -${parseInt(buffer)}%`;
+                let pValue = buffer === "" ? 0 : parseInt(buffer);
+                finalPrice = -(totalNow * (pValue / 100));
+                finalName = `ALE -${pValue}%`;
             }
             else if(p.type === "manual_fix") {
                 finalPrice = buffer === "" ? 0 : -(parseInt(buffer)/100);
@@ -197,6 +202,7 @@
             finalPrice = buffer !== "" ? parseInt(buffer)/100 : p.price/100;
             if(isReturn) finalPrice = -Math.abs(finalPrice);
             
+            // SMART STACK: Jos viimeisin tuote on sama samalla hinnalla -> lisää määrää
             let last = cart[cart.length-1];
             if(last && last.name === finalName && last.price === finalPrice) {
                 last.qty += xQty;
@@ -239,11 +245,11 @@
 
     function sellGiftCard() {
         let val = buffer==="" ? 50 : parseInt(buffer)/100;
-        cart.push({name: "LAHJA", price: val, qty: 1});
+        cart.push({name: "LAHJAKORTTI", price: val, qty: 1});
         updateReceipt(); clearBuffer();
     }
 
-    function payGiftCard() { if(prompt("KOODI:")) finalize("LAHJA"); }
+    function payGiftCard() { if(prompt("ANNA LAHJAKORTIN KOODI:")) finalize("LAHJA"); }
     function toggleReturn() { isReturn = !isReturn; document.getElementById('btn-ret').style.background = isReturn ? "yellow" : ""; }
     function voidLast() { cart.pop(); updateReceipt(); }
     function resetPOS() { cart=[]; clearBuffer(); updateReceipt(); isReturn=false; document.getElementById('btn-ret').style.background=""; }
@@ -260,7 +266,7 @@
     }
 
     function renderM() {
-        document.getElementById('t-m').innerHTML = `<tr><th>ID</th><th>NIMI</th><th>X</th></tr>` + clerks.map((c,i) => `<tr><td>${c.id}</td><td>${c.name}</td><td><button onclick="clerks.splice(${i},1);renderM()">X</button></td></tr>`).join('');
+        document.getElementById('t-m').innerHTML = `<tr><th>ID</th><th>NIMI</th><th>POISTA</th></tr>` + clerks.map((c,i) => `<tr><td>${c.id}</td><td>${c.name}</td><td><button onclick="clerks.splice(${i},1);renderM()">X</button></td></tr>`).join('');
     }
 
     function addClerk() {
