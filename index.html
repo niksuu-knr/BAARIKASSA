@@ -2,12 +2,12 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Web-QT6000 Pro - V21 MASSIVE BAR</title>
+    <title>Web-QT6000 Pro - V23 SMART LINE</title>
     <style>
         :root {
             --pos-blue: #1c2331; --screen-gray: #b0b8c0; --btn-num: #37474f;
             --btn-red: #c62828; --btn-blue: #1565c0; --btn-green: #2e7d32;
-            --btn-yellow: #f9a825; --prod-brown: #5d4037; --btn-mixer: #455a64;
+            --btn-yellow: #f9a825; --prod-brown: #5d4037; --btn-ale: #b71c1c;
         }
         body { margin: 0; background: #000; font-family: 'Segoe UI', sans-serif; color: white; height: 100vh; overflow: hidden; }
         
@@ -15,21 +15,22 @@
         #lock-input { background: #111; border: 3px solid #444; color: #0f0; font-size: 50px; text-align: center; padding: 20px; width: 350px; border-radius: 15px; outline: none; }
 
         #pos-container { display: none; width: 100vw; height: 100vh; grid-template-rows: 45px 1fr; padding: 5px; gap: 5px; box-sizing: border-box; }
-        #status-bar { background: var(--pos-blue); display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; padding: 0 20px; font-size: 15px; }
+        #status-bar { background: var(--pos-blue); display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; padding: 0 20px; font-size: 14px; border-bottom: 2px solid #000; }
 
         #main-layout { display: grid; grid-template-columns: 420px 1fr; gap: 10px; height: calc(100vh - 65px); }
         
-        #left-col { display: flex; flex-direction: column; gap: 8px; border-right: 2px solid #333; }
-        #receipt-area { background: var(--screen-gray); flex-grow: 1; border: 4px solid #555; color: #000; font-family: 'Courier New', monospace; padding: 15px; overflow-y: auto; white-space: pre; font-size: 15px; }
-        #buf-val { background: #000; color: #0f0; font-size: 45px; font-weight: bold; text-align: right; padding: 10px; border: 2px solid #555; border-radius: 5px; min-height: 55px; }
+        #left-col { display: flex; flex-direction: column; gap: 8px; border-right: 2px solid #333; padding-right: 5px; }
+        #receipt-area { background: var(--screen-gray); flex-grow: 1; border: 4px solid #555; color: #000; font-family: 'Courier New', monospace; padding: 15px; overflow-y: auto; white-space: pre; font-size: 15px; font-weight: bold; }
+        #buf-val { background: #000; color: #0f0; font-size: 45px; font-weight: bold; text-align: right; padding: 10px; border: 2px solid #555; border-radius: 5px; min-height: 60px; }
+        
         #keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; height: 420px; }
 
         #right-col { display: grid; grid-template-rows: auto 1fr; gap: 10px; overflow: hidden; }
         #group-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; background: #222; padding: 8px; border-radius: 8px; }
-        #product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); grid-auto-rows: 90px; gap: 8px; overflow-y: auto; padding: 5px; }
+        #product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); grid-auto-rows: 95px; gap: 8px; overflow-y: auto; padding: 5px; background: #111; }
 
         .btn { border-radius: 6px; border: 1px solid #333; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; user-select: none; font-size: 11px; box-shadow: 0 3px 0 #000; }
-        .btn:active { transform: translateY(2px); box-shadow: none; filter: brightness(1.6); }
+        .btn:active { transform: translateY(2px); box-shadow: none; filter: brightness(1.5); }
         
         .c-num { background: var(--btn-num); font-size: 24px; }
         .c-red { background: var(--btn-red); }
@@ -37,29 +38,34 @@
         .c-yellow { background: var(--btn-yellow); color: #000; }
         .c-blue { background: var(--btn-blue); }
         .c-prod { background: var(--prod-brown); flex-direction: column; padding: 5px; }
-        .c-group { background: #37474f; min-height: 50px; font-size: 12px; }
+        .c-ale-btn { background: var(--btn-ale); }
+        .c-group { background: #37474f; min-height: 55px; }
         .active-group { background: #546e7a; border-bottom: 4px solid #0f0; }
 
         #pgm-overlay { display: none; position: absolute; z-index: 11000; inset: 20px; background: #1a1a1a; flex-direction: column; border: 3px solid var(--btn-blue); }
-        .pgm-tabs { display: flex; background: #263238; }
-        .tab-btn { padding: 15px; cursor: pointer; color: #90a4ae; border: none; background: none; font-weight: bold; }
+        .tab-btn { padding: 15px 25px; cursor: pointer; color: #90a4ae; border: none; background: none; font-weight: bold; }
         .tab-btn.active { background: var(--btn-blue); color: #fff; }
-        #term-sim { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9000; align-items: center; justify-content: center; }
+        #term-sim { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9000; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div id="system-lock">
-    <h1>QT-6000 MASSIVE V21</h1>
-    <input type="password" id="lock-input" placeholder="KOODI">
+    <h1>QT-6000 V23 SMART RETAIL</h1>
+    <input type="password" id="lock-input" placeholder="ACCESS CODE" autocomplete="off">
 </div>
 
-<div id="term-sim"><div style="background:#333; padding:40px; border-radius:20px; color:#0f0; font-family:monospace; text-align:center;"><h2 id="term-sum">0.00 €</h2><p>LUE KORTTI</p></div></div>
+<div id="term-sim">
+    <div style="background: #333; border: 5px solid #666; width: 320px; padding: 30px; border-radius: 20px; text-align: center;">
+        <div style="background: #050; height: 80px; display: flex; align-items: center; justify-content: center; color: #0f0; font-size: 24px; font-family: monospace; border-radius: 10px;" id="term-sum">0.00 €</div>
+        <p style="color: #fff; margin-top: 15px;">LUE KORTTI...</p>
+    </div>
+</div>
 
 <div id="pos-container">
     <div id="status-bar">
         <span id="st-clerk">EI KIRJ.</span>
-        <span style="text-align:center">QT-6000 ENTERPRISE SYSTEM</span>
+        <span style="text-align:center">QT-6000 ROW STACKING ACTIVE</span>
         <span id="st-time">00:00:00</span>
     </div>
 
@@ -94,7 +100,6 @@
                 <div class="btn c-red" style="background:#222" onclick="cart=[];updateReceipt();">TYHJÄÄ</div>
             </div>
         </div>
-
         <div id="right-col">
             <div id="group-grid"></div>
             <div id="product-grid"></div>
@@ -108,9 +113,7 @@
         <div class="tab-btn" onclick="showTab('m')">MYYJÄT</div>
         <div class="tab-btn" style="margin-left:auto; background:red" onclick="togglePGM()">SULJE</div>
     </div>
-    <div id="pgm-p" style="padding:20px; overflow-y:auto; height:80%;">
-        <table id="t-p" style="width:100%; text-align:left;"></table>
-    </div>
+    <div id="pgm-p" style="padding:20px; overflow-y:auto; height:85%;"><table id="t-p" style="width:100%; text-align:left;"></table></div>
     <div id="pgm-m" style="padding:20px; display:none;">
         <input type="text" id="m-id" placeholder="ID"> <input type="text" id="m-name" placeholder="Nimi">
         <button onclick="addClerk()">LISÄÄ</button>
@@ -121,39 +124,26 @@
 <script>
     let db = {
         prods: [],
-        groups: [{id:1,name:"OLUET"},{id:2,name:"SIIDERIT"},{id:3,name:"VIINAT/GIN"},{id:4,name:"SHOTIT"},{id:5,name:"MIXERIT"},{id:6,name:"VIINIT"},{id:7,name:"RUOKA"},{id:8,name:"MUUT"}],
+        groups: [{id:1,name:"OLUET"},{id:2,name:"SIIDERIT"},{id:3,name:"VIINAT"},{id:4,name:"SHOTIT"},{id:5,name:"MIXERIT"},{id:6,name:"VIINIT"},{id:7,name:"RUOKA"},{id:8,name:"- ALE -"}],
         clerks: [{id:"1", name:"ADMIN"},{id:"123", name:"KASSA 1"}], giftcards: {}, sysPass: "94610758"
     };
 
     let cart = []; let buffer = ""; let xQty = 1; let currentClerk = null; let activeG = 1; let isReturn = false;
 
     const setup = () => {
-        // G1: OLUET (Laukutettu)
-        for(let i=1; i<=15; i++) db.prods.push({name:`HANABIERE ${i}`, price:750, gid:1});
-        ["KARHU","SANDELS","AURA","IPA","APA","NEIPA","STOUT","LAGER","PILS"].forEach(n => db.prods.push({name:n+" 0.5L", price:850, gid:1}));
-        
-        // G2: SIIDERI / LONKERO
-        ["HAPPY JOE","CROWMOOR","MAGNERS","STRONG BOW","LONKERO ORG","LONKERO RED","LONKERO LIME"].forEach(n => db.prods.push({name:n, price:820, gid:2}));
-        
-        // G3: VIINAT (Perusalkoholi drinkkeihin)
-        ["VODKA 4CL","GIN 4CL","ROMMI VALK.","ROMMI TUMMA","WHISKY HOUSE","TEQUILA BLANCO","VODKA 2CL","GIN 2CL"].forEach(n => db.prods.push({name:n, price:700, gid:3}));
-        ["HENNESSY","J.WALKER BLACK","MACALLAN","BEEFEATER 24","HENDRICKS"].forEach(n => db.prods.push({name:n, price:1200, gid:3}));
-
-        // G4: SHOTIT (Valtava lista)
-        ["FISU","SALMARI","MINTTU","JÄGER","HOT SHOT","TEQUILA ROSE","XANTE","FERNET","SAMBUCA","GAMMEL DANSK","ABSINTTI","FIREBALL","TURKINPIPPURI"].forEach(n => db.prods.push({name:n, price:700, gid:4}));
-
-        // G5: MIXERIT (Drinkin rakennus!)
-        ["+ COLA","+ SPRITE","+ TONIC","+ RED BULL","+ TUOREMEHU","+ SODA","+ GINGER BEER"].forEach(n => db.prods.push({name:n, price:250, gid:5}));
-        db.prods.push({name:"PELKKÄ COLA 0.5", price:450, gid:5}, {name:"REDBULL TÖLKKI", price:550, gid:5});
-
-        // G6: VIINIT
-        ["TALON PUNAVIINI","TALON VALKOVIINI","ROSEE","PROSECCO LASI","PROSECCO PULLO","SAMAPPANJA"].forEach(n => db.prods.push({name:n, price:950, gid:6}));
-
-        // G7: RUOKA
-        ["BURGER MEAL","VEGE BURGER","RANSKALAISET","SALAATTI","TOAST","PIANINI"].forEach(n => db.prods.push({name:n, price:1450, gid:7}));
-
-        // G8: MUUT
-        db.prods.push({name:"VAPAA HINTA", price:0, gid:8}, {name:"ALE 1€", price:100, gid:8}, {name:"HUKKA", price:0, gid:8});
+        ["KARHU","SANDELS","AURA","IPA","LAGER","PILS"].forEach(n => db.prods.push({name:n, price:800, gid:1}));
+        ["LONKERO","LONKERO RED","HAPPY JOE","CROWMOOR"].forEach(n => db.prods.push({name:n, price:820, gid:2}));
+        ["VODKA 4CL","GIN 4CL","ROMMI","BRANDY","HENNESSY"].forEach(n => db.prods.push({name:n, price:750, gid:3}));
+        ["FISU","SALMARI","MINTTU","JÄGER","HOT SHOT","TEQUILA","FIREBALL"].forEach(n => db.prods.push({name:n, price:700, gid:4}));
+        ["+ COLA","+ SPRITE","+ TONIC","+ RED BULL","+ SODA"].forEach(n => db.prods.push({name:n, price:250, gid:5}));
+        ["VALKOVIINI","PUNAVIINI","PROSECCO"].forEach(n => db.prods.push({name:n, price:950, gid:6}));
+        ["BURGER","RANSKALAISET","TOAST"].forEach(n => db.prods.push({name:n, price:1200, gid:7}));
+        db.prods.push(
+            {name:"STAFF -50%", price:-0.50, gid:8, mode:"perc"},
+            {name:"VIP -20%", price:-0.20, gid:8, mode:"perc"},
+            {name:"ALE -1.00€", price:-100, gid:8, mode:"fix"},
+            {name:"HUKKA", price:0, gid:8, mode:"fix"}
+        );
     };
 
     document.getElementById('lock-input').onkeypress = (e) => {
@@ -180,15 +170,37 @@
 
     function addProd(p) {
         if(!currentClerk) return alert("KIRJAUDU SISÄÄN!");
-        let price = buffer !== "" ? parseInt(buffer)/100 : p.price/100;
-        if(isReturn) price = -Math.abs(price);
-        cart.push({name: p.name, price: price, qty: xQty});
+        
+        let price = 0;
+        let pName = p.name;
+
+        if(p.gid === 8) {
+            let currentTotal = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
+            price = p.mode === "perc" ? currentTotal * p.price : p.price / 100;
+            cart.push({name: pName, price: price, qty: 1}); // Alennuksia ei pinota määrällisesti
+        } else {
+            price = buffer !== "" ? parseInt(buffer)/100 : p.price/100;
+            if(isReturn) price = -Math.abs(price);
+            
+            // SMART STACK LOGIIKKA:
+            let lastItem = cart[cart.length - 1];
+            if(lastItem && lastItem.name === pName && lastItem.price === price) {
+                lastItem.qty += xQty;
+            } else {
+                cart.push({name: pName, price: price, qty: xQty});
+            }
+        }
+        
         buffer = ""; xQty = 1; updateReceipt(); updateDisplay();
     }
 
     function updateReceipt() {
         let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
-        document.getElementById('receipt-area').innerText = cart.map(i => `${(i.qty>1?i.qty+'x ':'')+i.name.padEnd(20).substring(0,20)} ${(i.price*i.qty).toFixed(2).padStart(8)}`).join('\n') || "VALMIS";
+        document.getElementById('receipt-area').innerText = cart.map(i => {
+            let row = `${(i.qty>1?i.qty+'x ':'').padEnd(4)}${i.name.padEnd(20).substring(0,20)}`;
+            let price = (i.price*i.qty).toFixed(2).padStart(8);
+            return row + price;
+        }).join('\n') || "VALMIS";
     }
 
     function showSubtotal() {
@@ -204,35 +216,30 @@
         setTimeout(() => { document.getElementById('term-sim').style.display='none'; finalize("KORTTI"); }, 1200);
     }
 
-    function payCash() {
-        if(cart.length===0) return;
-        let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
-        finalize("KÄTEINEN");
-    }
+    function payCash() { if(cart.length>0) finalize("KÄTEINEN"); }
 
     function finalize(m) {
         let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
-        let txt = "     *** KUITTI ***\n\n" + cart.map(i => `${(i.qty>1?i.qty+'x ':'')+i.name.padEnd(20).substring(0,20)} ${(i.price*i.qty).toFixed(2).padStart(8)}`).join('\n');
-        txt += `\n${"-".repeat(29)}\nYHTEENSÄ: ${total.toFixed(2).padStart(18)} EUR\n${m}: ${total.toFixed(2).padStart(10)} EUR`;
+        let txt = "     *** KUITTI ***\n\n" + cart.map(i => `${(i.qty>1?i.qty+'x ':'').padEnd(4)}${i.name.padEnd(18).substring(0,18)} ${(i.price*i.qty).toFixed(2).padStart(8)}`).join('\n');
+        txt += `\n${"-".repeat(32)}\nYHTEENSÄ: ${total.toFixed(2).padStart(21)} EUR\n${m.padEnd(10)}: ${total.toFixed(2).padStart(20)} EUR`;
         document.getElementById('receipt-area').innerText = txt;
         cart = []; clearBuffer(); isReturn = false; document.getElementById('btn-ret').style.background = "";
     }
 
     function sellGiftCard() {
         let val = buffer==="" ? 50 : parseInt(buffer)/100;
-        let code = "L" + Math.floor(1000+Math.random()*8999);
-        cart.push({name: "LAHJA "+code, price: val, qty: 1});
+        cart.push({name: "LAHJA", price: val, qty: 1});
         updateReceipt(); clearBuffer();
     }
 
     function payGiftCard() { if(prompt("KOODI:")) finalize("LAHJA"); }
     function toggleReturn() { isReturn = !isReturn; document.getElementById('btn-ret').style.background = isReturn ? "yellow" : ""; }
     function voidLast() { cart.pop(); updateReceipt(); }
-    function resetPOS() { cart=[]; clearBuffer(); updateReceipt(); }
+    function resetPOS() { cart=[]; clearBuffer(); updateReceipt(); isReturn=false; document.getElementById('btn-ret').style.background=""; }
 
     function renderUI() {
         document.getElementById('group-grid').innerHTML = db.groups.map(g => `<div class="btn c-group ${g.id == activeG ? 'active-group' : ''}" onclick="activeG=${g.id};renderUI()">${g.name}</div>`).join('');
-        document.getElementById('product-grid').innerHTML = db.prods.filter(p => p.gid == activeG).map(p => `<div class="btn c-prod" onclick='addProd(${JSON.stringify(p)})'><span>${p.name}</span><b style="margin-top:auto;">${(p.price/100).toFixed(2)}€</b></div>`).join('');
+        document.getElementById('product-grid').innerHTML = db.prods.filter(p => p.gid == activeG).map(p => `<div class="btn c-prod ${p.gid==8?'c-ale-btn':''}" onclick='addProd(${JSON.stringify(p)})'><span>${p.name}</span><b style="margin-top:auto; font-size:16px;">${p.gid==8 ? '' : (p.price/100).toFixed(2)+'€'}</b></div>`).join('');
     }
 
     function togglePGM() {
@@ -247,7 +254,7 @@
     }
 
     function renderPGM() {
-        document.getElementById('t-p').innerHTML = `<tr><th>PLU</th><th>HINTA</th></tr>` + db.prods.map((p,i) => `<tr><td>${p.name}</td><td>${p.price/100}€</td><td><button onclick="db.prods.splice(${i},1);renderPGM();renderUI()">X</button></td></tr>`).join('');
+        document.getElementById('t-p').innerHTML = db.prods.map((p,i) => `<tr><td>${p.name}</td><td>${p.price}</td><td><button onclick="db.prods.splice(${i},1);renderPGM();renderUI()">X</button></td></tr>`).join('');
         document.getElementById('t-m').innerHTML = db.clerks.map(c => `<tr><td>${c.id}</td><td>${c.name}</td></tr>`).join('');
     }
 
