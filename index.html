@@ -2,7 +2,7 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Web-QT6000 Pro - V18 CLERK MGMT</title>
+    <title>Web-QT6000 Pro - V20 SHOT EDITION</title>
     <style>
         :root {
             --pos-blue: #1c2331; --screen-gray: #b0b8c0; --btn-num: #37474f;
@@ -28,7 +28,7 @@
 
         #right-col { display: grid; grid-template-rows: auto 1fr; gap: 10px; overflow: hidden; }
         #group-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; background: #222; padding: 8px; border-radius: 8px; }
-        #product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); grid-auto-rows: 135px; gap: 10px; overflow-y: auto; padding: 5px; background: #111; border-radius: 8px; }
+        #product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); grid-auto-rows: 130px; gap: 10px; overflow-y: auto; padding: 5px; }
 
         .btn { border-radius: 6px; border: 1px solid #333; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; text-transform: uppercase; user-select: none; font-size: 13px; box-shadow: 0 3px 0 #000; }
         .btn:active { transform: translateY(2px); box-shadow: none; filter: brightness(1.6); }
@@ -50,8 +50,7 @@
         .tab-btn.active { background: var(--btn-blue); color: #fff; }
         .pgm-content { flex-grow: 1; padding: 25px; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #222; }
-        th, td { border: 1px solid #444; padding: 12px; text-align: left; }
-        input, select { background: #000; color: #fff; border: 1px solid #555; padding: 10px; border-radius: 4px; }
+        th, td { border: 1px solid #444; padding: 10px; text-align: left; }
 
         #term-sim { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9000; align-items: center; justify-content: center; }
     </style>
@@ -59,21 +58,21 @@
 <body>
 
 <div id="system-lock">
-    <h1 style="letter-spacing: 10px;">QT-6000 V18</h1>
-    <input type="password" id="lock-input" placeholder="PASSCODE" autocomplete="off">
+    <h1 style="letter-spacing: 5px;">QT-6000 V20 PRO</h1>
+    <input type="password" id="lock-input" placeholder="ACCESS CODE" autocomplete="off">
 </div>
 
 <div id="term-sim">
-    <div style="background: #333; border: 5px solid #666; width: 350px; padding: 30px; border-radius: 20px; text-align: center;">
-        <div style="background: #050; height: 100px; display: flex; align-items: center; justify-content: center; color: #0f0; font-size: 28px; font-family: monospace; border-radius: 10px;" id="term-sum">0.00 €</div>
-        <p style="color: #fff; margin-top: 15px;">LUE KORTTI</p>
+    <div style="background: #333; border: 5px solid #666; width: 320px; padding: 30px; border-radius: 20px; text-align: center;">
+        <div style="background: #050; height: 80px; display: flex; align-items: center; justify-content: center; color: #0f0; font-size: 24px; font-family: monospace; border-radius: 10px;" id="term-sum">0.00 €</div>
+        <p style="color: #fff; margin-top: 15px;">KÄSITTELLÄÄN...</p>
     </div>
 </div>
 
 <div id="pos-container">
     <div id="status-bar">
-        <span id="st-clerk">MYYJÄ: -</span>
-        <span style="text-align:center">QT-6000 ENTERPRISE MGMT</span>
+        <span id="st-clerk">EI KIRJ.</span>
+        <span style="text-align:center">QT-6000 SHOT MASTER</span>
         <span id="st-time">00:00:00</span>
     </div>
 
@@ -120,27 +119,16 @@
     <div class="pgm-tabs">
         <div class="tab-btn active" id="tab-p" onclick="showTab('p')">TUOTTEET</div>
         <div class="tab-btn" id="tab-m" onclick="showTab('m')">MYYJIEN HALLINTA</div>
-        <div class="tab-btn" style="margin-left:auto; background:#b71c1c" onclick="togglePGM()">SULJE PGM</div>
+        <div class="tab-btn" style="margin-left:auto; background:#b71c1c" onclick="togglePGM()">SULJE</div>
     </div>
-    
     <div id="pgm-p" class="pgm-content">
-        <h3>PLU OHJELMOINTI</h3>
-        <div style="margin-bottom: 20px;">
-            <input type="text" id="p-n" placeholder="Nimi">
-            <input type="number" id="p-p" placeholder="Hinta snt">
-            <select id="p-g"></select>
-            <button class="btn" style="display:inline-flex; padding: 10px; width: 100px; background: green;" onclick="addP()">LISÄÄ</button>
-        </div>
+        <input type="text" id="p-n" placeholder="Nimi"> <input type="number" id="p-p" placeholder="snt">
+        <select id="p-g"></select> <button onclick="addP()">LISÄÄ</button>
         <table id="t-p"></table>
     </div>
-
     <div id="pgm-m" class="pgm-content" style="display:none">
-        <h3>MYYJIEN HALLINTA (CLERK CONFIG)</h3>
-        <div style="margin-bottom: 20px;">
-            <input type="text" id="m-id" placeholder="ID (esm. 123)">
-            <input type="text" id="m-name" placeholder="Myyjän nimi">
-            <button class="btn" style="display:inline-flex; padding: 10px; width: 150px; background: blue;" onclick="addClerk()">LISÄÄ MYYJÄ</button>
-        </div>
+        <input type="text" id="m-id" placeholder="ID"> <input type="text" id="m-name" placeholder="Nimi">
+        <button onclick="addClerk()">LISÄÄ MYYJÄ</button>
         <table id="t-m"></table>
     </div>
 </div>
@@ -148,17 +136,29 @@
 <script>
     let db = {
         prods: [],
-        groups: [{id:1,name:"OLUET"},{id:2,name:"SIIDERIT"},{id:3,name:"DRINKIT"},{id:4,name:"SHOTIT"},{id:5,name:"MIXERIT"},{id:6,name:"VIINIT"},{id:7,name:"RUOKA"},{id:8,name:"ALE/MUUT"}],
-        clerks: [{id:"1", name:"ADMIN"},{id:"123", name:"KASSA 1"}], 
-        giftcards: {}, sysPass: "94610758"
+        groups: [{id:1,name:"OLUET"},{id:2,name:"SIIDERIT"},{id:3,name:"DRINKIT"},{id:4,name:"SHOTIT"},{id:5,name:"VIRVOKKEET"},{id:6,name:"VIINIT"},{id:7,name:"RUOKA"},{id:8,name:"ALE/TOIM"}],
+        clerks: [{id:"1", name:"ADMIN"},{id:"123", name:"KASSA 1"}], giftcards: {}, sysPass: "94610758"
     };
 
     let cart = []; let buffer = ""; let xQty = 1; let currentClerk = null; let activeG = 1; let isReturn = false;
 
     const setup = () => {
-        ["KARHU","SANDELS","AURA"].forEach(n => db.prods.push({name:n+" 0.5L", price:750, gid:1}));
-        ["FISU","JÄGER","MINTTU"].forEach(n => db.prods.push({name:n+" 4CL", price:700, gid:4}));
-        db.prods.push({name:"ALE -1.00", price:100, gid:8}, {name:"HUKKA", price:0, gid:8});
+        // G1: OLUET
+        ["KARHU 0.4L","KARHU 0.5L","SANDELS 0.5L","AURA 0.5L","IPA 0.5L"].forEach(n => db.prods.push({name:n, price:750, gid:1}));
+        // G2: SIIDERI/LONKERO
+        ["LONKERO","LONKERO RED","HAPPY JOE","CROWMOOR"].forEach(n => db.prods.push({name:n, price:800, gid:2}));
+        // G3: DRINKIT
+        ["GT","MOSCOW MULE","KELKKA","VODKA REDBULL","NEGRONI"].forEach(n => db.prods.push({name:n, price:1200, gid:3}));
+        // G4: SHOTIT (Kaikki mukana!)
+        db.prods.push({name:"FISU 4CL", price:700, gid:4}, {name:"JÄGER 4CL", price:700, gid:4}, {name:"MINTTU 4CL", price:700, gid:4}, {name:"SALMARI 4CL", price:700, gid:4}, {name:"TEQUILA", price:750, gid:4}, {name:"HOT SHOT", price:850, gid:4}, {name:"FERNET BRANCA", price:750, gid:4}, {name:"SAMBUCA", price:750, gid:4});
+        // G5: VIRVOKKEET
+        ["COLA","COLA ZERO","SPRITE","VESI","REDBULL"].forEach(n => db.prods.push({name:n, price:400, gid:5}));
+        // G6: VIINIT
+        ["VALKOVIINI 12CL","PUNAVIINI 12CL","SKUMPPA"].forEach(n => db.prods.push({name:n, price:900, gid:6}));
+        // G7: RUOKA
+        ["BURGER","RANSKALAISET","PIZZA SLICE"].forEach(n => db.prods.push({name:n, price:1200, gid:7}));
+        // G8: ALE
+        db.prods.push({name:"ALE -1.00€", price:100, gid:8}, {name:"HUKKA/0€", price:0, gid:8});
     };
 
     document.getElementById('lock-input').onkeypress = (e) => {
@@ -179,8 +179,8 @@
 
     function clerkLogin() {
         let c = db.clerks.find(x => x.id === buffer);
-        if(c) { currentClerk = c; document.getElementById('st-clerk').innerText = "MYYJÄ: "+c.name; clearBuffer(); }
-        else { alert("VIRHEELLINEN ID"); clearBuffer(); }
+        if(c) { currentClerk = c; document.getElementById('st-clerk').innerText = c.name; clearBuffer(); }
+        else { alert("VIRHE"); clearBuffer(); }
     }
 
     function addProd(p) {
@@ -206,7 +206,7 @@
         let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
         document.getElementById('term-sum').innerText = total.toFixed(2) + " €";
         document.getElementById('term-sim').style.display='flex';
-        setTimeout(() => { document.getElementById('term-sim').style.display='none'; finalize("KORTTI"); }, 1500);
+        setTimeout(() => { document.getElementById('term-sim').style.display='none'; finalize("KORTTI"); }, 1200);
     }
 
     function payCash() {
@@ -239,11 +239,11 @@
 
     function toggleReturn() { isReturn = !isReturn; document.getElementById('btn-ret').style.background = isReturn ? "yellow" : ""; }
     function voidLast() { cart.pop(); updateReceipt(); }
-    function resetPOS() { cart=[]; clearBuffer(); updateReceipt(); }
+    function resetPOS() { cart=[]; clearBuffer(); updateReceipt(); isReturn=false; }
 
     function renderUI() {
         document.getElementById('group-grid').innerHTML = db.groups.map(g => `<div class="btn c-group ${g.id == activeG ? 'active-group' : ''}" onclick="activeG=${g.id};renderUI()">${g.name}</div>`).join('');
-        document.getElementById('product-grid').innerHTML = db.prods.filter(p => p.gid == activeG).map(p => `<div class="btn c-prod" onclick='addProd(${JSON.stringify(p)})'><span>${p.name}</span><b style="margin-top:auto; font-size:20px;">${(p.price/100).toFixed(2)}€</b></div>`).join('');
+        document.getElementById('product-grid').innerHTML = db.prods.filter(p => p.gid == activeG).map(p => `<div class="btn c-prod" onclick='addProd(${JSON.stringify(p)})'><span>${p.name}</span><b style="margin-top:auto; font-size:18px;">${(p.price/100).toFixed(2)}€</b></div>`).join('');
     }
 
     function togglePGM() {
@@ -261,8 +261,8 @@
     }
 
     function renderPGM() {
-        document.getElementById('t-p').innerHTML = `<tr><th>PLU</th><th>Hinta</th><th>Op</th></tr>` + db.prods.map((p,i) => `<tr><td>${p.name}</td><td>${p.price/100}€</td><td><button onclick="db.prods.splice(${i},1);renderPGM();renderUI()">X</button></td></tr>`).join('');
-        document.getElementById('t-m').innerHTML = `<tr><th>ID</th><th>Nimi</th><th>Op</th></tr>` + db.clerks.map((c,i) => `<tr><td>${c.id}</td><td>${c.name}</td><td><button onclick="db.clerks.splice(${i},1);renderPGM()">POISTA</button></td></tr>`).join('');
+        document.getElementById('t-p').innerHTML = `<tr><th>PLU</th><th>Hinta</th><th>X</th></tr>` + db.prods.map((p,i) => `<tr><td>${p.name}</td><td>${p.price/100}€</td><td><button onclick="db.prods.splice(${i},1);renderPGM();renderUI()">X</button></td></tr>`).join('');
+        document.getElementById('t-m').innerHTML = `<tr><th>ID</th><th>Nimi</th><th>X</th></tr>` + db.clerks.map((c,i) => `<tr><td>${c.id}</td><td>${c.name}</td><td><button onclick="db.clerks.splice(${i},1);renderPGM()">X</button></td></tr>`).join('');
         document.getElementById('p-g').innerHTML = db.groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
     }
 
@@ -273,7 +273,7 @@
 
     function addClerk() {
         let id = document.getElementById('m-id').value; let name = document.getElementById('m-name').value;
-        if(id && name) { db.clerks.push({id:id, name:name.toUpperCase()}); renderPGM(); document.getElementById('m-id').value=""; document.getElementById('m-name').value=""; }
+        if(id && name) { db.clerks.push({id:id, name:name.toUpperCase()}); renderPGM(); }
     }
 
     setInterval(() => document.getElementById('st-time').innerText = new Date().toLocaleTimeString('fi-FI'), 1000);
