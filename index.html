@@ -2,7 +2,7 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>QT-6000 V25 MAX-DATA</title>
+    <title>QT-6000 V28 FINAL PRO</title>
     <style>
         :root {
             --pos-blue: #1c2331; --screen-gray: #b0b8c0; --btn-num: #37474f;
@@ -21,7 +21,7 @@
         
         #left-col { display: flex; flex-direction: column; gap: 8px; border-right: 2px solid #333; padding-right: 5px; }
         #receipt-area { background: var(--screen-gray); flex-grow: 1; border: 4px solid #555; color: #000; font-family: 'Courier New', monospace; padding: 15px; overflow-y: auto; white-space: pre; font-size: 15px; font-weight: bold; }
-        #buf-val { background: #000; color: #0f0; font-size: 45px; font-weight: bold; text-align: right; padding: 10px; border: 2px solid #555; border-radius: 5px; min-height: 60px; }
+        #buf-val { background: #000; color: #0f0; font-size: 45px; font-weight: bold; text-align: right; padding: 10px; border: 2px solid #555; border-radius: 5px; min-height: 65px; line-height: 45px; }
         
         #keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; height: 420px; }
 
@@ -42,27 +42,43 @@
         .c-group { background: #37474f; min-height: 50px; }
         .active-group { background: #546e7a; border-bottom: 4px solid #0f0; }
 
-        #pgm-overlay { display: none; position: absolute; z-index: 11000; inset: 20px; background: #1a1a1a; flex-direction: column; border: 3px solid var(--btn-blue); }
-        #term-sim { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9000; align-items: center; justify-content: center; }
+        #term-sim { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 11000; align-items: center; justify-content: center; }
+        #term-box { background: #222; padding: 40px; border-radius: 20px; text-align: center; border: 5px solid #444; width: 350px; }
+
+        #pgm-overlay { display: none; position: fixed; inset: 10px; background: #1a1a1a; z-index: 12000; border: 2px solid var(--btn-blue); flex-direction: column; }
     </style>
 </head>
 <body>
 
 <div id="system-lock">
-    <h1>QT-6000 V25 MAX-DATA</h1>
-    <input type="password" id="lock-input" placeholder="ACCESS CODE" autocomplete="off">
+    <h1>QT-6000 V28 ULTIMATE</h1>
+    <input type="password" id="lock-input" placeholder="SYÖTÄ KOODI" autocomplete="off">
 </div>
 
 <div id="term-sim">
-    <div style="background: #333; padding: 40px; border-radius: 20px; text-align: center; color: #0f0; font-family: monospace;">
-        <h2 id="term-sum">0.00 €</h2><p>LUE KORTTI...</p>
+    <div id="term-box">
+        <div id="term-msg" style="color:#0f0; font-family:monospace; font-size:22px; margin-bottom:15px;">OTA YHTEYS...</div>
+        <div id="term-sum-display" style="font-size:35px; color:white; margin-bottom:20px;">0.00 €</div>
+        <div id="term-status" style="color:#aaa;">LUE KORTTI</div>
+    </div>
+</div>
+
+<div id="pgm-overlay">
+    <div style="background:var(--pos-blue); padding:15px; display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="margin:0">MYYJIEN HALLINTA / PGM</h2>
+        <button class="btn c-red" style="padding:10px 20px" onclick="togglePGM()">SULJE</button>
+    </div>
+    <div style="padding:20px;">
+        <input type="text" id="m-id" placeholder="MYYJÄ ID"> <input type="text" id="m-name" placeholder="MYYJÄN NIMI">
+        <button class="btn c-green" style="display:inline-block; padding:10px;" onclick="addClerk()">LISÄÄ MYYJÄ</button>
+        <table id="t-m" style="width:100%; margin-top:20px; color:white; text-align:left; border-collapse:collapse;"></table>
     </div>
 </div>
 
 <div id="pos-container">
     <div id="status-bar">
-        <span id="st-clerk">EI KIRJ.</span>
-        <span style="text-align:center">MAX-INVENTORY & SMART STACK</span>
+        <span id="st-clerk">EI KIRJAUTUNUT</span>
+        <span style="text-align:center">QT-6000 ENTERPRISE - ALL FEATURES ACTIVE</span>
         <span id="st-time">00:00:00</span>
     </div>
 
@@ -104,56 +120,27 @@
     </div>
 </div>
 
-<div id="pgm-overlay">
-    <div style="background:#263238; display:flex; padding:10px;">
-        <button class="btn c-blue" style="padding:10px 20px" onclick="togglePGM()">SULJE PGM</button>
-        <h2 style="margin:0 0 0 20px">MYYJIEN HALLINTA / PGM</h2>
-    </div>
-    <div style="padding:20px;">
-        <input type="text" id="m-id" placeholder="MYYJÄ ID"> <input type="text" id="m-name" placeholder="NIMI">
-        <button onclick="addClerk()">LISÄÄ MYYJÄ</button>
-        <table id="t-m" style="width:100%; margin-top:20px; text-align:left; border-collapse:collapse;"></table>
-    </div>
-</div>
-
 <script>
-    let db = {
-        prods: [],
-        groups: [
-            {id:1,name:"OLUET"},{id:2,name:"SIIDERIT"},{id:3,name:"VIINAT"},
-            {id:4,name:"SHOTIT"},{id:5,name:"MIXERIT"},{id:6,name:"VIINIT"},
-            {id:7,name:"RUOKA"},{id:8,name:"- ALE -"}
-        ]
+    let db = { 
+        prods: [], 
+        groups: [{id:1,name:"OLUET"},{id:2,name:"MIEDOT"},{id:3,name:"VIINAT"},{id:4,name:"SHOTIT"},{id:5,name:"MIXERIT"},{id:6,name:"VIINIT"},{id:7,name:"RUOKA"},{id:8,name:"- ALE -"}] 
     };
     let clerks = [{id:"1", name:"ADMIN"},{id:"123", name:"KASSA 1"}];
     let cart = []; let buffer = ""; let xQty = 1; let currentClerk = null; let activeG = 1; let isReturn = false;
 
-    // MASSIVE INVENTORY GENERATOR (100+ Tuotetta)
     const setup = () => {
-        // G1: OLUET (20 kpl)
-        ["KARHU","SANDELS","AURA","IPA","LAGER","PILS","STOUT","APA","NEIPA","VEHNÄ","HOLITON","KOFF","LAPIN KULTA","HEINEKEN","SOL","BUD","GUINNESS","PORTER","KAUSI-OLUT","ERIKOIS-IPA"].forEach(n => db.prods.push({name:n, price:850, gid:1}));
-        // G2: SIIDERI/LONKERO (15 kpl)
-        ["LONKERO ORG","LONKERO RED","LONKERO LIME","HAPPY JOE","CROWMOOR","MAGNERS","STRONG BOW","BULMERS","PERE MAGLOIRE","SOMERSBY","GINGER JOE","DRY APPLE","REVIEL","HENRY WESTONS","BACARDI BREEZER"].forEach(n => db.prods.push({name:n, price:820, gid:2}));
-        // G3: VIINAT (20 kpl)
-        ["VODKA","GIN","ROMMI V","ROMMI T","WHISKY HOUSE","BRANDY","HENNESSY","TEQUILA","BACARDI","SMIRNOFF","BEEFEATER","JAMESON","JACK DANIELS","BOMBAY","CAPTAIN MORGAN","JOHNNIE WALKER","MALIBU","PASSOA","BAILEYS","KOSKENKORVA"].forEach(n => db.prods.push({name:n, price:800, gid:3}));
-        // G4: SHOTIT (20 kpl)
-        ["FISU","SALMARI","MINTTU","JÄGER","HOT SHOT","FIREBALL","SAMBUCA","FERNET","XANTE","GAMMEL DANSK","ABSINTTI","TEQUILA ROSE","TURKINPIPPURI","VALHALLA","SAUNA-LONKERO","MINTTU CHOKO","DOPPELKORN","JALoviina","OUZO","GRAPPA"].forEach(n => db.prods.push({name:n, price:700, gid:4}));
-        // G5: MIXERIT (15 kpl)
-        ["+ COLA","+ SPRITE","+ TONIC","+ RED BULL","+ SODA","+ MEHU","+ GINGER B","+ MAITO","+ KAHVI","+ RUSCHIAN","+ LEMONADE","+ CRANBERRY","+ BITTER LEMON","PELKKÄ COLA","PELKKÄ REDBULL"].forEach(n => db.prods.push({name:n, price:250, gid:5}));
-        // G6: VIINIT (10 kpl)
-        ["VALKOVIINI","PUNAVIINI","ROSEE","PROSECCO LASI","PROSECCO PULLO","SKUMPPA","SAMAPPANJA","CAVA","KUIVA VALKO","MAKEA VALKO"].forEach(n => db.prods.push({name:n, price:950, gid:6}));
-        // G7: RUOKA (10 kpl)
-        ["BURGER","RANSKALAISET","NUGGETS","TOAST","PIZZA SLICE","NACHOS","MOZZARELLA STICKS","SALAATTI","VEGE BURGER","DIPPI"].forEach(n => db.prods.push({name:n, price:1200, gid:7}));
-        // G8: ALE (7 kpl)
-        db.prods.push(
-            {name:"STAFF -50%", price:-0.5, gid:8, type:"auto_perc"},
-            {name:"VIP -20%", price:-0.2, gid:8, type:"auto_perc"},
-            {name:"VAPAA ALE %", price:0, gid:8, type:"manual_perc"},
-            {name:"VAPAA ALE €", price:0, gid:8, type:"manual_fix"},
-            {name:"ALE -1.00€", price:-100, gid:8, type:"fix"},
-            {name:"ALE -2.00€", price:-200, gid:8, type:"fix"},
-            {name:"HUKKA", price:0, gid:8, type:"fix"}
-        );
+        // Tuotteet eri hinnoilla
+        const pData = [
+            {g:1, n:"KARHU 0.4", p:750}, {g:1, n:"KARHU 0.5", p:850}, {g:1, n:"GUINNESS", p:950}, {g:1, n:"SANDELS", p:790}, {g:1, n:"AURA", p:720}, {g:1, n:"IPA HOUSE", p:890},
+            {g:2, n:"LONKERO ORG", p:820}, {g:2, n:"LONKERO RED", p:820}, {g:2, n:"HAPPY JOE", p:790}, {g:2, n:"CROWMOOR", p:850}, {g:2, n:"SOMERSBY", p:750}, {g:2, n:"BACARDI B", p:950},
+            {g:3, n:"VODKA 4CL", p:700}, {g:3, n:"GIN 4CL", p:750}, {g:3, n:"ROMMI V", p:750}, {g:3, n:"HENNESSY", p:1250}, {g:3, n:"JACK DANIELS", p:950}, {g:3, n:"JALoviina", p:720},
+            {g:4, n:"FISU", p:650}, {g:4, n:"SALMARI", p:650}, {g:4, n:"MINTTU", p:700}, {g:4, n:"JÄGER", p:750}, {g:4, n:"FIREBALL", p:750}, {g:4, n:"HOT SHOT", p:850},
+            {g:5, n:"+ COLA", p:200}, {g:5, n:"+ RED BULL", p:350}, {g:5, n:"+ MEHU", p:150}, {g:5, n:"+ TONIC", p:250}, {g:5, n:"+ SODA", p:100},
+            {g:6, n:"PUNAVIINI", p:950}, {g:6, n:"VALKOVIINI", p:950}, {g:6, n:"PROSECCO", p:1100}, {g:6, n:"CAVA L", p:850},
+            {g:7, n:"BURGER", p:1250}, {g:7, n:"RANSKALAISET", p:550}, {g:7, n:"NUGGETS", p:750}, {g:7, n:"TOAST", p:650},
+            {g:8, n:"STAFF -50%", p:-0.5, t:"auto_perc"}, {g:8, n:"VAPAA ALE %", p:0, t:"manual_perc"}, {g:8, n:"VAPAA ALE €", p:0, t:"manual_fix"}, {g:8, n:"ALE -1€", p:-100, t:"fix"}
+        ];
+        pData.forEach(d => db.prods.push({name:d.n, price:d.p, gid:d.g, type:d.t||"fix"}));
     };
 
     document.getElementById('lock-input').onkeypress = (e) => {
@@ -167,50 +154,42 @@
     function num(v) { buffer += v; updateDisplay(); }
     function clearBuffer() { buffer = ""; xQty = 1; updateDisplay(); }
     function multiplier() { xQty = (buffer === "" || buffer === "0") ? 1 : parseInt(buffer); buffer = ""; updateDisplay(); }
-    function updateDisplay() { 
-        let val = buffer==="" ? (xQty>1 ? xQty+" X" : "0.00") : (parseInt(buffer)/100).toFixed(2);
-        document.getElementById('buf-val').innerText = val; 
+    
+    function updateDisplay(txt) { 
+        const d = document.getElementById('buf-val');
+        if(txt) { d.innerText = txt; setTimeout(() => { if(d.innerText===txt) updateDisplay(); }, 1200); }
+        else { d.innerText = buffer === "" ? (xQty > 1 ? xQty + " X" : "0.00") : (parseInt(buffer)/100).toFixed(2); }
     }
 
     function clerkLogin() {
         let c = clerks.find(x => x.id === buffer);
-        if(c) { currentClerk = c; document.getElementById('st-clerk').innerText = "KÄYTTÄJÄ: "+c.name; clearBuffer(); }
-        else { alert("VIRHE"); clearBuffer(); }
+        if(c) { currentClerk = c; document.getElementById('st-clerk').innerText = "MYYJÄ: "+c.name; updateDisplay("TERVE "+c.name); clearBuffer(); }
+        else { updateDisplay("VIRHE ID"); clearBuffer(); }
     }
 
     function addProd(p) {
-        if(!currentClerk) return alert("KIRJAUDU SISÄÄN!");
+        if(!currentClerk) return updateDisplay("KIRJAUDU!");
         let totalNow = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
-        let finalPrice = 0;
-        let finalName = p.name;
+        let finalPrice = 0; let finalName = p.name;
 
         if(p.gid === 8) {
             if(p.type === "auto_perc") finalPrice = totalNow * p.price;
             else if(p.type === "manual_perc") {
-                let pValue = buffer === "" ? 0 : parseInt(buffer);
-                finalPrice = -(totalNow * (pValue / 100));
-                finalName = `ALE -${pValue}%`;
-            }
-            else if(p.type === "manual_fix") {
-                finalPrice = buffer === "" ? 0 : -(parseInt(buffer)/100);
-                finalName = `ALE MUU`;
-            }
-            else finalPrice = p.price / 100;
-            
+                let v = buffer === "" ? 0 : parseInt(buffer);
+                finalPrice = -(totalNow * (v/100)); finalName = `ALE -${v}%`;
+            } else if(p.type === "manual_fix") {
+                finalPrice = buffer === "" ? 0 : -(parseInt(buffer)/100); finalName = "ALE MUU";
+            } else finalPrice = p.price / 100;
             cart.push({name: finalName, price: finalPrice, qty: 1});
         } else {
             finalPrice = buffer !== "" ? parseInt(buffer)/100 : p.price/100;
             if(isReturn) finalPrice = -Math.abs(finalPrice);
-            
-            // SMART STACK: Jos viimeisin tuote on sama samalla hinnalla -> lisää määrää
+            // STACKING LOGIC
             let last = cart[cart.length-1];
-            if(last && last.name === finalName && last.price === finalPrice) {
-                last.qty += xQty;
-            } else {
-                cart.push({name: finalName, price: finalPrice, qty: xQty});
-            }
+            if(last && last.name === finalName && last.price === finalPrice) { last.qty += xQty; }
+            else { cart.push({name: finalName, price: finalPrice, qty: xQty}); }
         }
-        buffer = ""; xQty = 1; updateReceipt(); updateDisplay();
+        updateDisplay(finalName); buffer = ""; xQty = 1; updateReceipt();
     }
 
     function updateReceipt() {
@@ -222,56 +201,70 @@
 
     function showSubtotal() {
         let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
-        document.getElementById('buf-val').innerText = "YHT: " + total.toFixed(2);
+        updateDisplay("YHT: " + total.toFixed(2));
     }
 
     function processCard() {
         if(cart.length===0) return;
         let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
-        document.getElementById('term-sum').innerText = total.toFixed(2) + " €";
-        document.getElementById('term-sim').style.display='flex';
-        setTimeout(() => { document.getElementById('term-sim').style.display='none'; finalize("KORTTI"); }, 1200);
+        const term = document.getElementById('term-sim');
+        const msg = document.getElementById('term-msg');
+        document.getElementById('term-sum-display').innerText = total.toFixed(2) + " €";
+        term.style.display = 'flex'; msg.innerText = "YHDISTETÄÄN...";
+
+        setTimeout(() => {
+            if(Math.random() < 0.3) {
+                msg.innerText = "YHTEYSVIRHE"; msg.style.color = "red";
+                setTimeout(() => { term.style.display = 'none'; msg.style.color = "#0f0"; }, 2000);
+            } else {
+                msg.innerText = "HYVÄKSYTTY";
+                setTimeout(() => { term.style.display = 'none'; finalize("KORTTI", total, total); }, 1000);
+            }
+        }, 2000);
     }
 
-    function payCash() { if(cart.length>0) finalize("KÄTEINEN"); }
-
-    function finalize(m) {
+    function payCash() {
+        if(cart.length===0) return;
         let total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
+        let received = buffer === "" ? total : parseInt(buffer)/100;
+        if(received < total) return updateDisplay("LIIAN VÄHÄN!");
+        let change = received - total;
+        updateDisplay("TAKAISIN: " + change.toFixed(2));
+        finalize("KÄTEINEN", total, received, change);
+    }
+
+    function finalize(method, total, received, change = 0) {
         let txt = "     *** KUITTI ***\n\n" + cart.map(i => `${(i.qty>1?i.qty+'x ':'').padEnd(4)}${i.name.padEnd(18).substring(0,18)} ${(i.price*i.qty).toFixed(2).padStart(8)}`).join('\n');
-        txt += `\n${"-".repeat(32)}\nYHTEENSÄ: ${total.toFixed(2).padStart(21)} EUR\n${m.padEnd(10)}: ${total.toFixed(2).padStart(20)} EUR`;
+        txt += `\n${"-".repeat(32)}\nYHTEENSÄ: ${total.toFixed(2).padStart(21)} EUR\n`;
+        txt += `${method.padEnd(10)}: ${received.toFixed(2).padStart(20)} EUR\n`;
+        if(method === "KÄTEINEN") txt += `VAIHTORAHA: ${change.toFixed(2).padStart(20)} EUR`;
         document.getElementById('receipt-area').innerText = txt;
-        cart = []; clearBuffer(); isReturn = false; document.getElementById('btn-ret').style.background = "";
-    }
-
-    function sellGiftCard() {
-        let val = buffer==="" ? 50 : parseInt(buffer)/100;
-        cart.push({name: "LAHJAKORTTI", price: val, qty: 1});
-        updateReceipt(); clearBuffer();
-    }
-
-    function payGiftCard() { if(prompt("ANNA LAHJAKORTIN KOODI:")) finalize("LAHJA"); }
-    function toggleReturn() { isReturn = !isReturn; document.getElementById('btn-ret').style.background = isReturn ? "yellow" : ""; }
-    function voidLast() { cart.pop(); updateReceipt(); }
-    function resetPOS() { cart=[]; clearBuffer(); updateReceipt(); isReturn=false; document.getElementById('btn-ret').style.background=""; }
-
-    function renderUI() {
-        document.getElementById('group-grid').innerHTML = db.groups.map(g => `<div class="btn c-group ${g.id == activeG ? 'active-group' : ''}" onclick="activeG=${g.id};renderUI()">${g.name}</div>`).join('');
-        document.getElementById('product-grid').innerHTML = db.prods.filter(p => p.gid == activeG).map(p => `<div class="btn c-prod ${p.gid==8?'c-ale-btn':''}" onclick='addProd(${JSON.stringify(p)})'><span>${p.name}</span><b style="margin-top:auto; font-size:15px;">${p.gid==8 ? '' : (p.price/100).toFixed(2)+'€'}</b></div>`).join('');
+        cart = []; buffer = ""; xQty = 1; isReturn = false; document.getElementById('btn-ret').style.background = "";
     }
 
     function togglePGM() {
-        let o = document.getElementById('pgm-overlay');
-        o.style.display = (o.style.display==='flex'?'none':'flex');
-        renderM();
+        const o = document.getElementById('pgm-overlay');
+        o.style.display = o.style.display === 'flex' ? 'none' : 'flex';
+        renderClerks();
     }
 
-    function renderM() {
-        document.getElementById('t-m').innerHTML = `<tr><th>ID</th><th>NIMI</th><th>POISTA</th></tr>` + clerks.map((c,i) => `<tr><td>${c.id}</td><td>${c.name}</td><td><button onclick="clerks.splice(${i},1);renderM()">X</button></td></tr>`).join('');
+    function renderClerks() {
+        document.getElementById('t-m').innerHTML = "<tr><th>ID</th><th>NIMI</th><th>POISTA</th></tr>" + 
+        clerks.map((c,i) => `<tr><td>${c.id}</td><td>${c.name}</td><td><button onclick="clerks.splice(${i},1);renderClerks()">X</button></td></tr>`).join('');
     }
 
     function addClerk() {
         let id = document.getElementById('m-id').value; let name = document.getElementById('m-name').value;
-        if(id && name) { clerks.push({id:id, name:name.toUpperCase()}); renderM(); }
+        if(id && name) { clerks.push({id, name: name.toUpperCase()}); renderClerks(); }
+    }
+
+    function toggleReturn() { isReturn = !isReturn; document.getElementById('btn-ret').style.background = isReturn ? "yellow" : ""; }
+    function voidLast() { cart.pop(); updateReceipt(); }
+    function resetPOS() { cart=[]; buffer=""; xQty=1; updateReceipt(); updateDisplay(); }
+
+    function renderUI() {
+        document.getElementById('group-grid').innerHTML = db.groups.map(g => `<div class="btn c-group ${g.id == activeG ? 'active-group' : ''}" onclick="activeG=${g.id};renderUI()">${g.name}</div>`).join('');
+        document.getElementById('product-grid').innerHTML = db.prods.filter(p => p.gid == activeG).map(p => `<div class="btn c-prod ${p.gid==8?'c-ale-btn':''}" onclick='addProd(${JSON.stringify(p)})'><span>${p.name}</span><b style="margin-top:auto; font-size:15px;">${p.gid==8 ? '' : (p.price/100).toFixed(2)+'€'}</b></div>`).join('');
     }
 
     setInterval(() => document.getElementById('st-time').innerText = new Date().toLocaleTimeString('fi-FI'), 1000);
